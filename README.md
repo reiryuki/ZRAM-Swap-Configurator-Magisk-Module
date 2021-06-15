@@ -1,7 +1,7 @@
 # Disk Info Magisk Module
 
 ## Descriptions
-- Bypass security restrictions of Disk Info app
+- Bypass security restrictions of Disk Info app, so we don't need to turn our device to Permissive state to use a complete working of Disk Info app.
 
 ## Requirements
 - Android 4 until 12
