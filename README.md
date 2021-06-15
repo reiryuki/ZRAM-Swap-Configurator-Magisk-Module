@@ -15,6 +15,9 @@
 
 ## Troubleshootings
 
+## Bug Report
+- https://t.me/androidryukimodsdiscussions/2618
+
 ## Channels
 - https://t.me/androidryukimods
 
