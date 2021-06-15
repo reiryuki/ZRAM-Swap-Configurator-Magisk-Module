@@ -2,6 +2,7 @@
 
 ## Descriptions
 - Bypass security restrictions of Disk Info app, so we don't need to turn our device to Permissive state to use a complete working of Disk Info app.
+- What's the app? Tap here: https://play.google.com/store/apps/details?id=me.kuder.diskinfo. Tap the "About this app" there.
 
 ## Requirements
 - Android 4 until 12
