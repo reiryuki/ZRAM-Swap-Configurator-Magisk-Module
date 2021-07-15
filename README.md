@@ -16,11 +16,11 @@
 ## Optional
 - You can resize your device ZRAM disksize to 2 giga bytes by run terminal before flashing:
 
-su
+  su
 
-`setprop zram.2gb 1`
+  `setprop zram.2gb 1`
 
-Flash the module after.
+  Flash the module after.
 
 ## Troubleshootings
 
