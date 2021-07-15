@@ -3,6 +3,7 @@
 ## Descriptions
 - Bypass security restrictions of Disk Info app, so we don't need to turn our device to Permissive state to use a complete working of Disk Info app.
 - What's the app? Tap here: https://play.google.com/store/apps/details?id=me.kuder.diskinfo. Tap the "About this app" there.
+- Added option to resize your ZRAM disksize to 2 GB
 
 ## Requirements
 - Android 4 until 12
@@ -13,6 +14,13 @@
 - Reboot
 
 ## Optional
+- You can resize your device ZRAM disksize to 2 giga bytes by run terminal before flashing:
+
+su
+
+`setprop zram.2gb 1`
+
+Flash the module after.
 
 ## Troubleshootings
 
