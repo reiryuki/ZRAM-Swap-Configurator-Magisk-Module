@@ -1,12 +1,12 @@
 # Disk Info Magisk Module
 
 ## Descriptions
-- Bypass security restrictions of Disk Info app, so we don't need to turn our device to Permissive state to use a complete working of Disk Info app.
+- Bypasses security restrictions of Disk Info app, so we don't need to turn our device to Permissive state to use a complete working of Disk Info app.
 - What's this app? Tap here: https://play.google.com/store/apps/details?id=me.kuder.diskinfo. Tap the "About this app" there.
-- Added option to resize your ZRAM disksize to 2 GB
+- Added option to resize your ZRAM disksize
 
 ## Requirements
-- Android 4 until 12
+- Android 4 and up
 - Magisk installed
 
 ## Instructions
@@ -14,22 +14,14 @@
 - Reboot
 
 ## Optionals
-- You can resize your device ZRAM disksize to 2 giga bytes by run terminal before flashing:
-
-  su
-
-  `setprop zram.2gb 1`
-
-  Flash the module after.
-
-## Troubleshootings
+- https://t.me/androidryukimodsdiscussions/58283
 
 ## Bug Report
 - https://t.me/androidryukimodsdiscussions/2618
 
 ## Credits and Contributors
-- Android Ryuki Mods Discussions Team
-- https://t.me/androidryukimodsdiscussions/25188
+- https://t.me/androidryukimodsdiscussions
+- https://t.me/androidappsportdevelopment
 
 ## Thanks for Donations
 - https://t.me/androidryukimodsdiscussions/2619
