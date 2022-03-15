@@ -13,7 +13,9 @@
 - Install this module via Magisk Manager or Recovery
 - Reboot
 
-## Optionals
+## Optionals and Troubleshootings
+- https://t.me/androidryukimodsdiscussions/29836
+- https://t.me/androidryukimodsdiscussions/60861
 - https://t.me/androidryukimodsdiscussions/58283
 
 ## Bug Report
