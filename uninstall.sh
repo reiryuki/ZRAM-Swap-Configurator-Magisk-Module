@@ -2,8 +2,8 @@
 
 mount /data
 mount -o rw,remount /data
-MODDIR=${0%/*}
-MODID=`echo "$MODDIR" | sed -n -e 's/\/data\/adb\/modules\///p'`
+MODPATH=${0%/*}
+MODID=`echo "$MODPATH" | sed -n -e 's/\/data\/adb\/modules\///p'`
 APP="`ls $MODPATH/system/priv-app` `ls $MODPATH/system/app`"
 for APPS in $APP; do
   rm -f `find /data/dalvik-cache /data/resource-cache -type f -name *$APPS*.apk`

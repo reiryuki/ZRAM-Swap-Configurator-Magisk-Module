@@ -2,27 +2,22 @@
 
 mount /data
 mount -o rw,remount /data
-MODDIR=${0%/*}
+MODPATH=${0%/*}
+
+# debug
+magiskpolicy --live "dontaudit system_server system_file file write"
+magiskpolicy --live "allow     system_server system_file file write"
+exec 2>$MODPATH/debug-pfsd.log
+set -x
 
 # run
-FILE=$MODDIR/sepolicy.sh
+FILE=$MODPATH/sepolicy.sh
 if [ -f $FILE ]; then
   sh $FILE
 fi
 
-# zram
-chmod 0644 /sys/block/zram0/disksize
-#1echo 1G > /sys/block/zram0/disksize
-#2echo 2G > /sys/block/zram0/disksize
-#3echo 3G > /sys/block/zram0/disksize
-#4echo 4G > /sys/block/zram0/disksize
-#75%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
-#75%MemTotal=${MemTotalStr:16:8}
-#75%let ZRAM="$MemTotal * 3 / 4"
-#75%echo $ZRAM\K > /sys/block/zram0/disksize
-
 # cleaning
-FILE=$MODDIR/cleaner.sh
+FILE=$MODPATH/cleaner.sh
 if [ -f $FILE ]; then
   sh $FILE
   rm -f $FILE

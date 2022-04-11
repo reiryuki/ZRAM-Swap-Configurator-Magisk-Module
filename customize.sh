@@ -1,5 +1,12 @@
 ui_print " "
 
+# magisk
+if [ -d /sbin/.magisk ]; then
+  MAGISKTMP=/sbin/.magisk
+else
+  MAGISKTMP=`find /dev -mindepth 2 -maxdepth 2 -type d -name .magisk`
+fi
+
 # info
 MODVER=`grep_prop version $MODPATH/module.prop`
 MODVERCODE=`grep_prop versionCode $MODPATH/module.prop`
@@ -22,6 +29,10 @@ else
 fi
 
 # sepolicy.rule
+if [ "$BOOTMODE" != true ]; then
+  mount -o rw -t auto /dev/block/bootdevice/by-name/persist /persist
+  mount -o rw -t auto /dev/block/bootdevice/by-name/metadata /metadata
+fi
 FILE=$MODPATH/sepolicy.sh
 DES=$MODPATH/sepolicy.rule
 if [ -f $FILE ] && ! getprop | grep -Eq "sepolicy.sh\]: \[1"; then
@@ -72,13 +83,6 @@ elif getprop | grep -Eq "permissive.mode\]: \[2"; then
   ui_print "- Using both permissive and SE policy patch"
   permissive
   ui_print " "
-fi
-
-# magisk
-if [ -d /sbin/.magisk ]; then
-  MAGISKTMP=/sbin/.magisk
-else
-  MAGISKTMP=`find /dev -mindepth 2 -maxdepth 2 -type d -name .magisk`
 fi
 
 # zram
