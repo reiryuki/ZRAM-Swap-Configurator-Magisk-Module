@@ -1,20 +1,12 @@
-(
-
 MODPATH=${0%/*}
+API=`getprop ro.build.version.sdk`
 
 # debug
 exec 2>$MODPATH/debug.log
 set -x
 
-# prevent soft reboot
-echo 0 > /proc/sys/kernel/panic
-echo 0 > /proc/sys/kernel/panic_on_oops
-echo 0 > /proc/sys/kernel/panic_on_rcu_stall
-echo 0 > /proc/sys/kernel/panic_on_warn
-echo 0 > /proc/sys/vm/panic_on_oom
-
 # wait
-sleep 60
+sleep 40
 
 # zram
 #1ZRAM=1G
@@ -33,11 +25,12 @@ if [ "$ZRAM" ]; then
   swapon /dev/block/zram0
 fi
 
+# wait
+sleep 20
+
 # grant
 PKG=me.kuder.diskinfo
 pm grant $PKG android.permission.READ_EXTERNAL_STORAGE
 pm grant $PKG android.permission.ACCESS_MEDIA_LOCATION
-
-) 2>/dev/null
 
 

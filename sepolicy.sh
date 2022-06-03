@@ -1,3 +1,7 @@
+# debug
+magiskpolicy --live "dontaudit system_server system_file file write"
+magiskpolicy --live "allow     system_server system_file file write"
+
 # dir
 magiskpolicy --live "dontaudit { system_app priv_app platform_app untrusted_app_29 untrusted_app_27 untrusted_app } { block_device mnt_vendor_file mnt_media_rw_file } dir search"
 magiskpolicy --live "allow     { system_app priv_app platform_app untrusted_app_29 untrusted_app_27 untrusted_app } { block_device mnt_vendor_file mnt_media_rw_file } dir search"
