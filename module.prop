@@ -1,6 +1,6 @@
 id=DiskInfo
 name=Disk Info
-version=v1.9-beta.1
+version=v1.9
 versionCode=9
 author=Rei Ryuki the Fixer
 description=Bypasses security restrictions for Disk Info app. Added options to resize ZRAM disk.
