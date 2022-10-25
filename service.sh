@@ -32,5 +32,8 @@ sleep 20
 PKG=me.kuder.diskinfo
 pm grant $PKG android.permission.READ_EXTERNAL_STORAGE
 pm grant $PKG android.permission.ACCESS_MEDIA_LOCATION
+if [ "$API" -ge 30 ]; then
+  appops set $PKG AUTO_REVOKE_PERMISSIONS_IF_UNUSED ignore
+fi
 
 
