@@ -6,6 +6,12 @@ exec 2>$MODPATH/debug-pfsd.log
 set -x
 
 # run
+FILE=$MODPATH/sepolicy.pfsd
+if [ -f $FILE ]; then
+  magiskpolicy --live --apply $FILE
+fi
+
+# run
 FILE=$MODPATH/sepolicy.sh
 if [ -f $FILE ]; then
   . $FILE

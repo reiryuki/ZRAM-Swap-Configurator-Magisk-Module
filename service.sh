@@ -6,34 +6,36 @@ exec 2>$MODPATH/debug.log
 set -x
 
 # wait
-sleep 40
+until [ "`getprop sys.boot_completed`" == "1" ]; do
+  sleep 10
+done
 
 # zram
+#oZRAM=2G
 #1ZRAM=1G
-#2ZRAM=2G
 #3ZRAM=3G
 #4ZRAM=4G
 #75%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
 #75%MemTotal=${MemTotalStr:16:8}
 #75%let VALUE="$MemTotal * 3 / 4"
 #75%ZRAM=$VALUE\K
-if [ "$ZRAM" ]; then
-  swapoff /dev/block/zram0
-  echo 1 > /sys/block/zram0/reset
-  echo $ZRAM > /sys/block/zram0/disksize
-  mkswap /dev/block/zram0
-  swapon /dev/block/zram0
-fi
+#rMemTotalStr=`cat /proc/meminfo | grep MemTotal`
+#rZRAM=${MemTotalStr:16:8}\K
+swapoff /dev/block/zram0
+echo 1 > /sys/block/zram0/reset
+#oecho $ZRAM > /sys/block/zram0/disksize
+#omkswap /dev/block/zram0
+#oswapon /dev/block/zram0
 
-# wait
-sleep 20
 
-# grant
-PKG=me.kuder.diskinfo
-pm grant $PKG android.permission.READ_EXTERNAL_STORAGE
-pm grant $PKG android.permission.ACCESS_MEDIA_LOCATION
-if [ "$API" -ge 30 ]; then
-  appops set $PKG AUTO_REVOKE_PERMISSIONS_IF_UNUSED ignore
-fi
+
+
+
+
+
+
+
+
+
 
 

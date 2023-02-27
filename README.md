@@ -1,22 +1,20 @@
-# Disk Info Magisk Module
+# ZRAM Swap Configurator Magisk Module
 
 ## Descriptions
-- Bypasses security restrictions of Disk Info app, so we don't need to turn our device to Permissive state to use a complete working of Disk Info app.
-- What's this app? Tap here: https://play.google.com/store/apps/details?id=me.kuder.diskinfo. Tap the "About this app" there.
-- Added option to resize your ZRAM disksize (Read Optionals!)
+- Configures your device ZRAM Swap disk. Resizes ZRAM Swap disk to 2 GB as default.
 
 ## Requirements
-- Android 4 and up
 - Magisk installed
 
 ## Installation Guide & Download Link
-- Install this module https://www.pling.com/p/1539032/ via Magisk Manager or Recovery
+- Install this module https://www.pling.com/p/1539032/ via Magisk app or Recovery
 - Reboot
+- Install Disk Info app from Play Store to see your device Swap size changes
 
 ## Optionals and Troubleshootings
+- https://t.me/androidryukimodsdiscussions/58283
 - https://t.me/androidryukimodsdiscussions/29836
 - https://t.me/androidryukimodsdiscussions/60861
-- https://t.me/androidryukimodsdiscussions/58283
 
 ## Support & Bug Report
 - https://t.me/androidryukimodsdiscussions/2618
@@ -31,5 +29,9 @@
 - https://ko-fi.com/reiryuki
 - https://www.paypal.me/reiryuki
 - https://t.me/androidryukimodsdiscussions/2619
+
+
+
+
 
 

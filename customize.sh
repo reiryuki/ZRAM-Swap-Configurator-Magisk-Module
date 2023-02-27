@@ -19,12 +19,23 @@ fi
 SYSTEM=`realpath $MIRROR/system`
 PRODUCT=`realpath $MIRROR/product`
 VENDOR=`realpath $MIRROR/vendor`
-SYSTEM_EXT=`realpath $MIRROR/system/system_ext`
-ODM=`realpath /odm`
-MY_PRODUCT=`realpath /my_product`
+SYSTEM_EXT=`realpath $MIRROR/system_ext`
+if [ -d $MIRROR/odm ]; then
+  ODM=`realpath $MIRROR/odm`
+else
+  ODM=`realpath /odm`
+fi
+if [ -d $MIRROR/my_product ]; then
+  MY_PRODUCT=`realpath $MIRROR/my_product`
+else
+  MY_PRODUCT=`realpath /my_product`
+fi
 
 # optionals
 OPTIONALS=/sdcard/optionals.prop
+if [ ! -f $OPTIONALS ]; then
+  touch $OPTIONALS
+fi
 
 # info
 MODVER=`grep_prop version $MODPATH/module.prop`
@@ -36,17 +47,6 @@ ui_print " MagiskVersion=$MAGISK_VER"
 ui_print " MagiskVersionCode=$MAGISK_VER_CODE"
 ui_print " "
 
-# sdk
-NUM=14
-if [ "$API" -lt $NUM ]; then
-  ui_print "! Unsupported SDK $API. You have to upgrade your"
-  ui_print "  Android version at least SDK API $NUM to use this module."
-  abort
-else
-  ui_print "- SDK $API"
-  ui_print " "
-fi
-
 # mount
 if [ "$BOOTMODE" != true ]; then
   mount -o rw -t auto /dev/block/bootdevice/by-name/cust /vendor
@@ -55,13 +55,12 @@ if [ "$BOOTMODE" != true ]; then
   mount -o rw -t auto /dev/block/bootdevice/by-name/metadata /metadata
 fi
 
-# sepolicy.rule
-FILE=$MODPATH/sepolicy.sh
-DES=$MODPATH/sepolicy.rule
-if [ -f $FILE ] && [ "`grep_prop sepolicy.sh $OPTIONALS`" != 1 ]; then
+# sepolicy
+FILE=$MODPATH/sepolicy.rule
+DES=$MODPATH/sepolicy.pfsd
+if [ "`grep_prop sepolicy.sh $OPTIONALS`" == 1 ]\
+&& [ -f $FILE ]; then
   mv -f $FILE $DES
-  sed -i 's/magiskpolicy --live "//g' $DES
-  sed -i 's/"//g' $DES
 fi
 
 # cleaning
@@ -116,31 +115,42 @@ fi
 
 # zram
 PROP=`grep_prop zram.resize $OPTIONALS`
-if [ "$PROP" == 1 ]; then
-  ui_print "- Activating ZRAM resize disk to 1 GB..."
-  sed -i 's/#1//g' $MODPATH/post-fs-data.sh
-  sed -i 's/#1//g' $MODPATH/service.sh
-  ui_print " "
-elif [ "$PROP" == 2 ]; then
-  ui_print "- Activating ZRAM resize disk to 2 GB..."
-  sed -i 's/#2//g' $MODPATH/post-fs-data.sh
-  sed -i 's/#2//g' $MODPATH/service.sh
-  ui_print " "
-elif [ "$PROP" == 3 ]; then
-  ui_print "- Activating ZRAM resize disk to 3 GB..."
-  sed -i 's/#3//g' $MODPATH/post-fs-data.sh
-  sed -i 's/#3//g' $MODPATH/service.sh
-  ui_print " "
-elif [ "$PROP" == 4 ]; then
-  ui_print "- Activating ZRAM resize disk to 4 GB..."
-  sed -i 's/#4//g' $MODPATH/post-fs-data.sh
-  sed -i 's/#4//g' $MODPATH/service.sh
-  ui_print " "
-elif [ "$PROP" == 75% ]; then
-  ui_print "- Activating ZRAM resize disk to 75% of RAM..."
-  sed -i 's/#75%//g' $MODPATH/post-fs-data.sh
-  sed -i 's/#75%//g' $MODPATH/service.sh
-  ui_print " "
+if [ "$PROP" == 0 ]; then
+  ui_print "- ZRAM swap will be disabled"
+else
+  ui_print "- Activating ZRAM resize disk"
+  sed -i 's/#o//g' $MODPATH/service.sh
+  if [ "$PROP" == ram ]; then
+    ui_print "  equals to RAM disk..."
+    sed -i 's/#r//g' $MODPATH/service.sh
+  elif [ "$PROP" == 75% ]; then
+    ui_print "  to 75% of RAM..."
+    sed -i 's/#75%//g' $MODPATH/service.sh
+  elif [ "$PROP" == 1 ]; then
+    ui_print "  to 1 GB..."
+    sed -i 's/#1//g' $MODPATH/service.sh
+  elif [ "$PROP" == 3 ]; then
+    ui_print "  to 3 GB..."
+    sed -i 's/#3//g' $MODPATH/service.sh
+  elif [ "$PROP" == 4 ]; then
+    ui_print "  to 4 GB..."
+    sed -i 's/#4//g' $MODPATH/service.sh
+  else
+    ui_print "  to 2 GB..."
+    sed -i 's/#2//g' $MODPATH/service.sh
+  fi
 fi
+ui_print " "
+
+
+
+
+
+
+
+
+
+
+
 
 

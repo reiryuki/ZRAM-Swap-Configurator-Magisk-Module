@@ -1,8 +1,8 @@
-id=DiskInfo
-name=Disk Info
-version=v1.10
-versionCode=10
+id=ZRAMSwapConfigurator
+name=ZRAM Swap Configurator
+version=v1.11
+versionCode=11
 author=Rei Ryuki the Fixer
-description=Bypasses security restrictions for Disk Info app. Added options to resize ZRAM disk.
+description=Configures your device ZRAM swap disk.
 
 
