@@ -117,30 +117,38 @@ fi
 PROP=`grep_prop zram.resize $OPTIONALS`
 if [ "$PROP" == 0 ]; then
   ui_print "- ZRAM swap will be disabled"
+  ui_print " "
 else
-  ui_print "- Activating ZRAM resize disk"
+  FILE=/sys/block/zram0/disksize
+  ui_print "- Changes $FILE"
   sed -i 's/#o//g' $MODPATH/service.sh
-  if [ "$PROP" == ram ]; then
-    ui_print "  equals to RAM disk..."
-    sed -i 's/#r//g' $MODPATH/service.sh
-  elif [ "$PROP" == 75% ]; then
-    ui_print "  to 75% of RAM..."
-    sed -i 's/#75%//g' $MODPATH/service.sh
-  elif [ "$PROP" == 1 ]; then
-    ui_print "  to 1 GB..."
-    sed -i 's/#1//g' $MODPATH/service.sh
-  elif [ "$PROP" == 3 ]; then
-    ui_print "  to 3 GB..."
-    sed -i 's/#3//g' $MODPATH/service.sh
-  elif [ "$PROP" == 4 ]; then
-    ui_print "  to 4 GB..."
-    sed -i 's/#4//g' $MODPATH/service.sh
+  if echo "$PROP" | grep -Eq %; then
+    ui_print "  to $PROP of RAM size"
+    PROP=`echo "$PROP" | sed 's/%//'`
+    sed -i "s/VAR/$PROP/g" $MODPATH/service.sh
+    sed -i 's/#%//g' $MODPATH/service.sh
+  elif [ "$PROP" ]; then
+    ui_print "  to $PROP Byte"
+    sed -i "s/ZRAM=2G/ZRAM=$PROP/g" $MODPATH/service.sh
   else
-    ui_print "  to 2 GB..."
-    sed -i 's/#2//g' $MODPATH/service.sh
+    ui_print "  to 2G Byte"
+  fi
+  ui_print " "
+  PROP=`grep_prop zram.algo $OPTIONALS`
+  if [ "$PROP" ]; then
+    FILE=/sys/block/zram0/comp_algorithm
+    if grep -Eq "$PROP" $FILE; then
+      ui_print "- Changes $FILE"
+      ui_print "  to $PROP"
+      sed -i "s/#ALGO=/ALGO=$PROP/g" $MODPATH/service.sh
+    else
+      ui_print "! $PROP is unsupported"
+      ui_print "  in $FILE"
+    fi
+    ui_print " "
   fi
 fi
-ui_print " "
+
 
 
 
