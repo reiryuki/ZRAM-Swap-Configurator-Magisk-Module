@@ -2,7 +2,7 @@
 
 ## Descriptions
 - Configures your device ZRAM Swap disk. Resizes ZRAM Swap disk to 2 GB as default.
-- What's ZRAM Swap? Please read it at Google documentation.
+- What's ZRAM Swap? Please read it at Google documentation instead!
 - This module is a tool for advanced users only. There will never recommendations nor restrictions. All at user respective policies. Do not use this if you don't even know what is this! DwYOR!
 
 ## Requirements
