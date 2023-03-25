@@ -7,7 +7,7 @@ set -x
 
 # wait
 until [ "`getprop sys.boot_completed`" == "1" ]; do
-  sleep 10
+  sleep 1
 done
 
 # zram
