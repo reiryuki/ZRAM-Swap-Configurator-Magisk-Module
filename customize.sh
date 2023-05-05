@@ -127,9 +127,9 @@ else
     sed -i 's/#%//g' $MODPATH/service.sh
   elif [ "$PROP" ]; then
     ui_print "  to $PROP Byte"
-    sed -i "s/ZRAM=2G/ZRAM=$PROP/g" $MODPATH/service.sh
+    sed -i "s/ZRAM=3G/ZRAM=$PROP/g" $MODPATH/service.sh
   else
-    ui_print "  to 2G Byte"
+    ui_print "  to 3G Byte"
   fi
   ui_print " "
   PROP=`grep_prop zram.algo $OPTIONALS`
