@@ -6,10 +6,10 @@
 - This module is a tool for advanced users only. There will never recommendations nor restrictions. All at user respective policies. Do not use this if you don't even know what is this! DwYOR!
 
 ## Requirements
-- Magisk installed
+- Magisk or KernelSU installed
 
 ## Installation Guide & Download Link
-- Install this module https://www.pling.com/p/1539032/ via Magisk app or Recovery
+- Install this module https://www.pling.com/p/1539032/ via Magisk app or KernelSU app or Recovery (unless you are using KernelSU)
 - Reboot
 - Install Disk Info app from Play Store to see your device Swap size changes
 

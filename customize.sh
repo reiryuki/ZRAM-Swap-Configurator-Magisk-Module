@@ -1,33 +1,21 @@
 # space
 ui_print " "
 
-# magisk
-if [ -d /sbin/.magisk ]; then
-  MAGISKTMP=/sbin/.magisk
+# info
+MODVER=`grep_prop version $MODPATH/module.prop`
+MODVERCODE=`grep_prop versionCode $MODPATH/module.prop`
+ui_print " ID=$MODID"
+ui_print " Version=$MODVER"
+ui_print " VersionCode=$MODVERCODE"
+if [ "$KSU" == true ]; then
+  ui_print " KSUVersion=$KSU_VER"
+  ui_print " KSUVersionCode=$KSU_VER_CODE"
+  ui_print " KSUKernelVersionCode=$KSU_KERNEL_VER_CODE"
 else
-  MAGISKTMP=`realpath /dev/*/.magisk`
+  ui_print " MagiskVersion=$MAGISK_VER"
+  ui_print " MagiskVersionCode=$MAGISK_VER_CODE"
 fi
-
-# path
-if [ "$BOOTMODE" == true ]; then
-  MIRROR=$MAGISKTMP/mirror
-else
-  MIRROR=
-fi
-SYSTEM=`realpath $MIRROR/system`
-PRODUCT=`realpath $MIRROR/product`
-VENDOR=`realpath $MIRROR/vendor`
-SYSTEM_EXT=`realpath $MIRROR/system_ext`
-if [ -d $MIRROR/odm ]; then
-  ODM=`realpath $MIRROR/odm`
-else
-  ODM=`realpath /odm`
-fi
-if [ -d $MIRROR/my_product ]; then
-  MY_PRODUCT=`realpath $MIRROR/my_product`
-else
-  MY_PRODUCT=`realpath /my_product`
-fi
+ui_print " "
 
 # optionals
 OPTIONALS=/sdcard/optionals.prop
@@ -35,20 +23,13 @@ if [ ! -f $OPTIONALS ]; then
   touch $OPTIONALS
 fi
 
-# info
-MODVER=`grep_prop version $MODPATH/module.prop`
-MODVERCODE=`grep_prop versionCode $MODPATH/module.prop`
-ui_print " ID=$MODID"
-ui_print " Version=$MODVER"
-ui_print " VersionCode=$MODVERCODE"
-ui_print " MagiskVersion=$MAGISK_VER"
-ui_print " MagiskVersionCode=$MAGISK_VER_CODE"
-ui_print " "
-
 # mount
 if [ "$BOOTMODE" != true ]; then
-  mount -o rw -t auto /dev/block/bootdevice/by-name/cust /vendor
-  mount -o rw -t auto /dev/block/bootdevice/by-name/vendor /vendor
+  if [ -e /dev/block/bootdevice/by-name/vendor ]; then
+    mount -o rw -t auto /dev/block/bootdevice/by-name/vendor /vendor
+  else
+    mount -o rw -t auto /dev/block/bootdevice/by-name/cust /vendor
+  fi
   mount -o rw -t auto /dev/block/bootdevice/by-name/persist /persist
   mount -o rw -t auto /dev/block/bootdevice/by-name/metadata /metadata
 fi

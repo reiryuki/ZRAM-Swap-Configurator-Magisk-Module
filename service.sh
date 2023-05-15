@@ -20,6 +20,7 @@ done
 #%MemTotal=${MemTotalStr:16:8}
 #%let VALUE="$MemTotal * VAR / 100"
 #%ZRAM=$VALUE\K
+swapoff /dev/block/zram0
 echo 1 > /sys/block/zram0/reset
 if [ "$ALGO" ]; then
   echo "$ALGO" > /sys/block/zram0/comp_algorithm
