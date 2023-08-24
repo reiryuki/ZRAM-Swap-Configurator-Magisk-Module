@@ -11,7 +11,7 @@ set -x
 
 # cleaning
 remove_sepolicy_rule
-resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
+
 
 
 
