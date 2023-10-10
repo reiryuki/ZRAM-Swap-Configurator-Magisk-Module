@@ -9,6 +9,19 @@ if [ "$BOOTMODE" != true ]; then
   ui_print " "
 fi
 
+# optionals
+OPTIONALS=/sdcard/optionals.prop
+if [ ! -f $OPTIONALS ]; then
+  touch $OPTIONALS
+fi
+
+# debug
+if [ "`grep_prop debug.log $OPTIONALS`" == 1 ]; then
+  ui_print "- The install log will contain detailed information"
+  set -x
+  ui_print " "
+fi
+
 # run
 . $MODPATH/function.sh
 
@@ -28,12 +41,6 @@ else
   ui_print " MagiskVersionCode=$MAGISK_VER_CODE"
 fi
 ui_print " "
-
-# optionals
-OPTIONALS=/sdcard/optionals.prop
-if [ ! -f $OPTIONALS ]; then
-  touch $OPTIONALS
-fi
 
 # sepolicy
 FILE=$MODPATH/sepolicy.rule
@@ -56,15 +63,15 @@ if [ "$PROP" == 0 ]; then
 else
   FILE=/sys/block/zram0/disksize
   ui_print "- Changes $FILE"
-  sed -i 's/#o//g' $MODPATH/service.sh
+  sed -i 's|#o||g' $MODPATH/service.sh
   if echo "$PROP" | grep -q %; then
     ui_print "  to $PROP of RAM size"
-    PROP=`echo "$PROP" | sed 's/%//'`
-    sed -i "s/VAR/$PROP/g" $MODPATH/service.sh
-    sed -i 's/#%//g' $MODPATH/service.sh
+    PROP=`echo "$PROP" | sed 's|%||g'`
+    sed -i "s|VAR|$PROP|g" $MODPATH/service.sh
+    sed -i 's|#%||g' $MODPATH/service.sh
   elif [ "$PROP" ]; then
     ui_print "  to $PROP Byte"
-    sed -i "s/ZRAM=3G/ZRAM=$PROP/g" $MODPATH/service.sh
+    sed -i "s|ZRAM=3G|ZRAM=$PROP|g" $MODPATH/service.sh
   else
     ui_print "  to 3G Byte"
   fi
@@ -75,7 +82,7 @@ else
     if grep -q "$PROP" $FILE; then
       ui_print "- Changes $FILE"
       ui_print "  to $PROP"
-      sed -i "s/#ALGO=/ALGO=$PROP/g" $MODPATH/service.sh
+      sed -i "s|#ALGO=|ALGO=$PROP|g" $MODPATH/service.sh
     else
       ui_print "! $PROP is unsupported"
       ui_print "  in $FILE"

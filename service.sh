@@ -1,8 +1,8 @@
 MODPATH=${0%/*}
-API=`getprop ro.build.version.sdk`
 
 # log
-exec 2>$MODPATH/debug.log
+LOGFILE=$MODPATH/debug.log
+exec 2>$LOGFILE
 set -x
 
 # disable zram
@@ -13,10 +13,14 @@ until [ "`getprop sys.boot_completed`" == "1" ]; do
   sleep 1
 done
 
-# zram
+# default
 DEF=`cat /sys/block/zram0/disksize`
 DEF=`cat /sys/block/zram0/comp_algorithm`
 DEF=`cat /proc/sys/vm/swappiness`
+DEF=`getprop ro.lmk.swap_free_low_percentage`
+DEF=`getprop ro.lmk.thrashing_limit_critical`
+
+# zram
 #ALGO=
 #oZRAM=3G
 #%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
@@ -38,15 +42,34 @@ resetprop ro.lmk.swap_free_low_percentage 1
 resetprop --delete ro.lmk.thrashing_limit_critical
 killall lmkd
 
-# wait
-sleep 240
+# function
+stop_log() {
+SIZE=`du $LOGFILE | sed "s|$LOGFILE||g"`
+if [ "$LOG" != stopped ] && [ "$SIZE" -gt 25 ]; then
+  exec 2>/dev/null
+  set +x
+  LOG=stopped
+fi
+}
+delete_config() {
+stop_log
+sleep 300
+DEF=`device_config get lmkd_native swap_free_low_percentage`
+DEF2=`device_config get lmkd_native thrashing_limit_critical`
+DEF3=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
+DEF4=`getprop persist.device_config.lmkd_native.thrashing_limit_critical`
+if [ "$DEF" != null ] || [ "$DEF2" != null ] || [ "$DEF3" ] || [ "$DEF4" ]; then
+  device_config delete lmkd_native swap_free_low_percentage
+  device_config delete lmkd_native thrashing_limit_critical
+  resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
+  resetprop -p --delete persist.device_config.lmkd_native.thrashing_limit_critical
+  killall lmkd
+fi
+delete_config
+}
 
-# prop
-resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
-resetprop -p --delete persist.device_config.lmkd_native.thrashing_limit_critical
-killall lmkd
-
-
+# delete prop
+delete_config
 
 
 
