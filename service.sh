@@ -38,7 +38,7 @@ fi
 #oswapon /dev/block/zram0
 
 # prop
-resetprop ro.lmk.swap_free_low_percentage 1
+resetprop -n ro.lmk.swap_free_low_percentage 1
 resetprop --delete ro.lmk.thrashing_limit_critical
 killall lmkd
 

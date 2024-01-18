@@ -19,8 +19,8 @@
 
 ## Optionals and Troubleshootings
 - https://t.me/androidryukimodsdiscussions/58283
-- https://t.me/androidryukimodsdiscussions/29836
-- https://t.me/androidryukimodsdiscussions/60861
+- Global: https://t.me/androidryukimodsdiscussions/29836
+- Global: https://t.me/androidryukimodsdiscussions/60861
 
 ## Support & Bug Report
 - https://t.me/androidryukimodsdiscussions/2618
