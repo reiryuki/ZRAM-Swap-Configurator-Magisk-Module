@@ -9,7 +9,7 @@ set -x
 swapoff /dev/block/zram0
 
 # wait
-until [ "`getprop sys.boot_completed`" == "1" ]; do
+until [ "`getprop sys.boot_completed`" == 1 ]; do
   sleep 1
 done
 
@@ -37,12 +37,11 @@ fi
 #omkswap /dev/block/zram0
 #oswapon /dev/block/zram0
 
-# prop
-resetprop -n ro.lmk.swap_free_low_percentage 1
-resetprop --delete ro.lmk.thrashing_limit_critical
-killall lmkd
-
 # function
+lmk_prop() {
+resetprop -n ro.lmk.swap_free_low_percentage 1
+resetprop lmkd.reinit 1
+}
 stop_log() {
 SIZE=`du $LOGFILE | sed "s|$LOGFILE||g"`
 if [ "$LOG" != stopped ] && [ "$SIZE" -gt 25 ]; then
@@ -51,7 +50,7 @@ if [ "$LOG" != stopped ] && [ "$SIZE" -gt 25 ]; then
   LOG=stopped
 fi
 }
-delete_config() {
+lmk_config() {
 stop_log
 sleep 300
 DEF=`device_config get lmkd_native swap_free_low_percentage`
@@ -63,13 +62,14 @@ if [ "$DEF" != null ] || [ "$DEF2" != null ] || [ "$DEF3" ] || [ "$DEF4" ]; then
   device_config delete lmkd_native thrashing_limit_critical
   resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
   resetprop -p --delete persist.device_config.lmkd_native.thrashing_limit_critical
-  killall lmkd
+  resetprop lmkd.reinit 1
 fi
-delete_config
+lmk_config
 }
 
-# delete prop
-delete_config
+# prop
+#Llmk_prop
+#Llmk_config
 
 
 

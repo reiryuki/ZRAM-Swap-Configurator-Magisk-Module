@@ -3,9 +3,7 @@
 ## Descriptions
 - Configures your device ZRAM Swap disk
 - Resizes ZRAM Swap disk to 3 GB as default (READ Optionals bellow if you want different configurations!)
-- Sets /proc/sys/vm/swappiness to 100
-- Sets ro.lmk.swap_free_low_percentage to 1
-- Removes persist.device_config.lmkd_native.swap_free_low_percentage, ro.lmk.thrashing_limit_critical, & persist.device_config.lmkd_native.thrashing_limit_critical.
+- Sets several swap settings
 - What's ZRAM Swap? Read this: https://t.me/androidryukimods/1002. For more detailed information, please read it at Android & Google documentation instead!
 - This module is a tool for advanced users only. There will never recommendations nor restrictions. All at user respective policies. Do not use this if you don't even know what is this! DwYOR!
 

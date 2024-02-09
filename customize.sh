@@ -61,8 +61,9 @@ ui_print " "
 # zram
 PROP=`grep_prop zram.resize $OPTIONALS`
 if [ "$PROP" == 0 ]; then
-  ui_print "- ZRAM swap will be disabled"
+  ui_print "- ZRAM Swap will be disabled"
   ui_print " "
+  LMK=false
 else
   FILE=/sys/block/zram0/disksize
   ui_print "- Changes $FILE"
@@ -92,9 +93,20 @@ else
     fi
     ui_print " "
   fi
+  if [ "`grep_prop zram.lmk $OPTIONALS`" == 0 ]; then
+    LMK=false
+  else
+    LMK=true
+  fi
 fi
 
-
+# lmk
+if [ $LMK == true ]; then
+  sed -i 's|#L||g' $MODPATH/service.sh
+else
+  ui_print "- Does not use LMK configs"
+  ui_print " "
+fi
 
 
 
