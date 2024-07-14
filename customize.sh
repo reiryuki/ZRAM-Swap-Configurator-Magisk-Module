@@ -25,6 +25,13 @@ if [ "`grep_prop debug.log $OPTIONALS`" == 1 ]; then
   ui_print " "
 fi
 
+# recovery
+if [ "$BOOTMODE" != true ]; then
+  MODPATH_UPDATE=`echo $MODPATH | sed 's|modules/|modules_update/|g'`
+  rm -f $MODPATH/update
+  rm -rf $MODPATH_UPDATE
+fi
+
 # run
 . $MODPATH/function.sh
 
@@ -45,20 +52,12 @@ else
 fi
 ui_print " "
 
-# sepolicy
-FILE=$MODPATH/sepolicy.rule
-DES=$MODPATH/sepolicy.pfsd
-if [ "`grep_prop sepolicy.sh $OPTIONALS`" == 1 ]\
-&& [ -f $FILE ]; then
-  mv -f $FILE $DES
-fi
-
 # cleaning
 ui_print "- Cleaning..."
 remove_sepolicy_rule
 ui_print " "
 
-# zram
+# disksize
 PROP=`grep_prop zram.resize $OPTIONALS`
 if [ "$PROP" == 0 ]; then
   ui_print "- ZRAM Swap will be disabled"
@@ -74,10 +73,10 @@ else
     sed -i "s|VAR|$PROP|g" $MODPATH/service.sh
     sed -i 's|#%||g' $MODPATH/service.sh
   elif [ "$PROP" ]; then
-    ui_print "  to $PROP Byte"
+    ui_print "  to $PROP byte"
     sed -i "s|ZRAM=3G|ZRAM=$PROP|g" $MODPATH/service.sh
   else
-    ui_print "  to 3G Byte"
+    ui_print "  to 3G byte"
   fi
   ui_print " "
   PROP=`grep_prop zram.algo $OPTIONALS`
@@ -86,32 +85,53 @@ else
     if grep -q "$PROP" $FILE; then
       ui_print "- Changes $FILE"
       ui_print "  to $PROP"
-      sed -i "s|#ALGO=|ALGO=$PROP|g" $MODPATH/service.sh
+      sed -i "s|ALGO=|ALGO=$PROP|g" $MODPATH/service.sh
     else
       ui_print "! $PROP is unsupported"
       ui_print "  in $FILE"
     fi
     ui_print " "
   fi
-  if [ "`grep_prop zram.lmk $OPTIONALS`" == 0 ]; then
-    LMK=false
-  else
-    LMK=true
+fi
+
+# swappiness
+PROP=`grep_prop zram.swps $OPTIONALS`
+if [ "$PROP" ]; then
+  if [ "$PROP" -gt 100 ]; then
+    PROP=100
+  elif [ "$PROP" -lt 0 ]; then
+    unset PROP
   fi
 fi
-
-# lmk
-if [ $LMK == true ]; then
-  sed -i 's|#L||g' $MODPATH/service.sh
+FILE=/proc/sys/vm/swappiness
+if [ "$PROP" ]; then
+  ui_print "- Changes $FILE"
+  ui_print "  to $PROP"
+  sed -i "s|SWPS=100|SWPS=$PROP|g" $MODPATH/service.sh
 else
-  ui_print "- Does not use LMK configs"
-  ui_print " "
+  ui_print "- Changes $FILE"
+  ui_print "  to 100"
 fi
+ui_print " "
 
-
-
-
-
+# swap_free_low_percentage
+PROP=`grep_prop zram.sflp $OPTIONALS`
+if [ "$PROP" ]; then
+  if [ "$PROP" -gt 100 ]; then
+    PROP=100
+  elif [ "$PROP" -lt 0 ]; then
+    unset PROP
+  fi
+fi
+if [ "$PROP" ]; then
+  ui_print "- Changes swap_free_low_percentage"
+  ui_print "  to $PROP"
+  sed -i "s|SFLP=0|SFLP=$PROP|g" $MODPATH/service.sh
+else
+  ui_print "- Changes swap_free_low_percentage"
+  ui_print "  to 0"
+fi
+ui_print " "
 
 
 

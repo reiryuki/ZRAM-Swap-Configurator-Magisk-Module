@@ -2,7 +2,7 @@
 
 ## Descriptions
 - Configures your device ZRAM Swap disk
-- Resizes ZRAM Swap disk to 3 GB as default (READ Optionals bellow if you want different configurations!)
+- Resizes ZRAM Swap disk to 3 GB by default (READ Optionals bellow if you want different configurations!)
 - Sets several swap settings
 - What's ZRAM Swap? Read this: https://t.me/androidryukimods/1002. For more detailed information, please read it at Android & Google documentation instead!
 - This module is a tool for advanced users only. There will never recommendations nor restrictions. All at user respective policies. Do not use this if you don't even know what is this! DwYOR!
@@ -28,10 +28,7 @@
 - https://t.me/androidryukimodsdiscussions
 - You can contribute ideas about this Magisk Module here: https://t.me/androidappsportdevelopment
 
-## Thanks for Donations
-This Magisk Module is always will be free but you can however show us that you are care by making a donations:
-- https://ko-fi.com/reiryuki
-- https://www.paypal.me/reiryuki
+## Sponsors
 - https://t.me/androidryukimodsdiscussions/2619
 
 
