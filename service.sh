@@ -5,8 +5,11 @@ LOGFILE=$MODPATH/debug.log
 exec 2>$LOGFILE
 set -x
 
+# var
+ZRAM=/block/zram0
+
 # disable zram
-swapoff /dev/block/zram0
+swapoff /dev$ZRAM
 
 # wait
 until [ "`getprop sys.boot_completed`" == 1 ]; do
@@ -14,30 +17,33 @@ until [ "`getprop sys.boot_completed`" == 1 ]; do
 done
 
 # default
-DEF=`cat /sys/block/zram0/disksize`
-DEF=`cat /sys/block/zram0/comp_algorithm`
+DEF=`cat /sys$ZRAM/disksize`
+DEF=`cat /sys$ZRAM/comp_algorithm`
 DEF=`cat /proc/sys/vm/swappiness`
 DEF=`getprop ro.lmk.swap_free_low_percentage`
-
-# zram
-ZRAM=3G
-#%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
-#%MemTotal=${MemTotalStr:16:8}
-#%let VALUE="$MemTotal * VAR / 100"
-#%ZRAM=$VALUE\K
-swapoff /dev/block/zram0
-echo 1 > /sys/block/zram0/reset
-ALGO=
-if [ "$ALGO" ]; then
-  echo "$ALGO" > /sys/block/zram0/comp_algorithm
-fi
-#oecho "$ZRAM" > /sys/block/zram0/disksize
-#omkswap /dev/block/zram0
-#oswapon /dev/block/zram0
 
 # swappiness
 SWPS=100
 echo "$SWPS" > /proc/sys/vm/swappiness
+
+# zram
+DISKSIZE=3G
+#%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
+#%MemTotal=${MemTotalStr:16:8}
+#%let VALUE="$MemTotal * VAR / 100"
+#%DISKSIZE=$VALUE\K
+swapoff /dev$ZRAM
+echo 1 > /sys$ZRAM/reset
+ALGO=
+if [ "$ALGO" ]; then
+  echo "$ALGO" > /sys$ZRAM/comp_algorithm
+fi
+#oecho "$DISKSIZE" > /sys$ZRAM/disksize
+#omkswap /dev$ZRAM
+PRIO=0
+#o/system/bin/swapon /dev$ZRAM -p "$PRIO"\
+#o|| /vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
+#o|| swapon /dev$ZRAM
 
 # function
 lmk_prop() {
