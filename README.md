@@ -15,10 +15,12 @@
 - Reboot
 - Install Disk Info app from Play Store to see your device Swap size changes
 
-## Optionals and Troubleshootings
-- https://t.me/androidryukimodsdiscussions/58283
-- Global: https://t.me/androidryukimodsdiscussions/29836
+## Optionals
+- https://t.me/ryukinotes/6
 - Global: https://t.me/androidryukimodsdiscussions/60861
+
+## Troubleshootings
+- Global: https://t.me/androidryukimodsdiscussions/29836
 
 ## Support & Bug Report
 - https://t.me/androidryukimodsdiscussions/2618
