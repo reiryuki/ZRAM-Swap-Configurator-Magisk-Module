@@ -41,9 +41,35 @@ fi
 #oecho "$DISKSIZE" > /sys$ZRAM/disksize
 #omkswap /dev$ZRAM
 PRIO=0
-#o/system/bin/swapon /dev$ZRAM -p "$PRIO"\
-#o|| /vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
-#o|| swapon /dev$ZRAM
+
+supports_priority() {
+    $1 --help 2>&1 | grep -q '\-p'
+}
+
+#o# Define the paths to swapon binaries
+#oswapon_binaries="
+#o/system/bin/swapon
+#o/vendor/bin/swapon
+#oswapon
+#o"
+
+#oswapon_success=0
+
+#o# First, try swapon binaries with -p option if supported
+#ofor swapon_bin in $swapon_binaries; do
+#o    if supports_priority "$swapon_bin"; then
+#o        log -t KernelSU "trying $swapon_bin with prio";
+#o        $swapon_bin /dev$ZRAM -p "$PRIO" && swapon_success=1 && break
+#o    fi
+#odone
+
+#o# If no swapon binary succeeded with -p, fallback to using swapon binaries without -p
+#oif [ "$swapon_success" -eq 0 ]; then
+#o    for swapon_bin in $swapon_binaries; do
+#o        log -t KernelSU "trying $swapon_bin no prio"
+#o        $swapon_bin /dev$ZRAM && swapon_success=1 && break
+#o    done
+#ofi
 
 # function
 lmk_prop() {
