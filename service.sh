@@ -43,6 +43,7 @@ fi
 PRIO=0
 #o/system/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o|| /vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
+#o|| /system/vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o|| swapon /dev$ZRAM
 
 # function
@@ -72,7 +73,7 @@ lmk_config
 }
 
 # prop
-SFLP=1
+SFLP=2
 lmk_prop
 lmk_config
 
