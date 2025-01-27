@@ -136,10 +136,10 @@ fi
 if [ "$PROP" ]; then
   ui_print "- Changes swap_free_low_percentage"
   ui_print "  to $PROP"
-  sed -i "s|SFLP=2|SFLP=$PROP|g" $MODPATH/service.sh
+  sed -i "s|SFLP=0|SFLP=$PROP|g" $MODPATH/service.sh
 else
   ui_print "- Changes swap_free_low_percentage"
-  ui_print "  to 2"
+  ui_print "  to 0"
 fi
 ui_print " "
 

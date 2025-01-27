@@ -73,7 +73,7 @@ lmk_config
 }
 
 # prop
-SFLP=2
+SFLP=0
 lmk_prop
 lmk_config
 
