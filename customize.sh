@@ -114,12 +114,42 @@ if [ "$PROP" ]; then
   fi
 fi
 FILE=/proc/sys/vm/swappiness
+ui_print "- Changes $FILE"
 if [ "$PROP" ]; then
-  ui_print "- Changes $FILE"
   ui_print "  to $PROP"
   sed -i "s|SWPS=100|SWPS=$PROP|g" $MODPATH/service.sh
 else
-  ui_print "- Changes $FILE"
+  ui_print "  to 100"
+fi
+ui_print " "
+
+# swap_ratio_enable
+PROP=`grep_prop zram.swpre $OPTIONALS`
+FILE=/proc/sys/vm/swap_ratio_enable
+ui_print "- Changes $FILE"
+if [ "$PROP" == 0 ]; then
+  ui_print "  to $PROP"
+  sed -i "s|SWPRE=1|SWPRE=$PROP|g" $MODPATH/service.sh
+else
+  ui_print "  to 1"
+fi
+ui_print " "
+
+# swap_ratio
+PROP=`grep_prop zram.swpr $OPTIONALS`
+if [ "$PROP" ]; then
+  if [ "$PROP" -gt 100 ]; then
+    PROP=100
+  elif [ "$PROP" -lt 0 ]; then
+    unset PROP
+  fi
+fi
+FILE=/proc/sys/vm/swap_ratio
+ui_print "- Changes $FILE"
+if [ "$PROP" ]; then
+  ui_print "  to $PROP"
+  sed -i "s|SWPR=100|SWPR=$PROP|g" $MODPATH/service.sh
+else
   ui_print "  to 100"
 fi
 ui_print " "
@@ -133,12 +163,11 @@ if [ "$PROP" ]; then
     unset PROP
   fi
 fi
+ui_print "- Changes swap_free_low_percentage"
 if [ "$PROP" ]; then
-  ui_print "- Changes swap_free_low_percentage"
   ui_print "  to $PROP"
   sed -i "s|SFLP=0|SFLP=$PROP|g" $MODPATH/service.sh
 else
-  ui_print "- Changes swap_free_low_percentage"
   ui_print "  to 0"
 fi
 ui_print " "

@@ -16,17 +16,23 @@ until [ "`getprop sys.boot_completed`" == 1 ]; do
   sleep 1
 done
 
-# default
-DEF=`cat /sys$ZRAM/disksize`
-DEF=`cat /sys$ZRAM/comp_algorithm`
-DEF=`cat /proc/sys/vm/swappiness`
-DEF=`getprop ro.lmk.swap_free_low_percentage`
-
 # swappiness
+DEF=`cat /proc/sys/vm/swappiness`
 SWPS=100
 echo "$SWPS" > /proc/sys/vm/swappiness
 
+# swap_ratio_enable
+DEF=`cat /proc/sys/vm/swap_ratio_enable`
+SWPRE=1
+echo "$SWPRE" > /proc/sys/vm/swap_ratio_enable
+
+# swap_ratio
+DEF=`cat /proc/sys/vm/swap_ratio`
+SWPR=100
+echo "$SWPR" > /proc/sys/vm/swap_ratio
+
 # zram
+DEF=`cat /sys$ZRAM/disksize`
 DISKSIZE=3G
 #%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
 #%MemTotal=${MemTotalStr:16:8}
@@ -34,6 +40,7 @@ DISKSIZE=3G
 #%DISKSIZE=$VALUE\K
 swapoff /dev$ZRAM
 echo 1 > /sys$ZRAM/reset
+DEF=`cat /sys$ZRAM/comp_algorithm`
 ALGO=
 if [ "$ALGO" ]; then
   echo "$ALGO" > /sys$ZRAM/comp_algorithm
@@ -73,6 +80,7 @@ lmk_config
 }
 
 # prop
+DEF=`getprop ro.lmk.swap_free_low_percentage`
 SFLP=0
 lmk_prop
 lmk_config
