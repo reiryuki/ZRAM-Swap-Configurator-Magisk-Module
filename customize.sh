@@ -172,6 +172,18 @@ else
 fi
 ui_print " "
 
+# thrashing_limit_critical
+PROP=`grep_prop zram.tlc $OPTIONALS`
+if [ "$PROP" == 1 ]; then
+  ui_print "- Does not remove thrashing_limit_critical"
+else
+  ui_print "- Removes thrashing_limit_critical"
+  sed -i "s|#thrashing_limit_critical|thrashing_limit_critical|g" $MODPATH/service.sh
+fi
+ui_print " "
+
+
+
 
 
 

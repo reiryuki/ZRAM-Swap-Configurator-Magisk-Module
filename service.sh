@@ -58,6 +58,10 @@ lmk_prop() {
 resetprop -n ro.lmk.swap_free_low_percentage "$SFLP"
 resetprop lmkd.reinit 1
 }
+thrashing_limit_critical_prop() {
+resetprop --delete ro.lmk.thrashing_limit_critical
+resetprop lmkd.reinit 1
+}
 stop_log() {
 SIZE=`du $LOGFILE | sed "s|$LOGFILE||g"`
 if [ "$LOG" != stopped ] && [ "$SIZE" -gt 25 ]; then
@@ -66,9 +70,19 @@ if [ "$LOG" != stopped ] && [ "$SIZE" -gt 25 ]; then
   LOG=stopped
 fi
 }
+thrashing_limit_critical_config() {
+DEF=`device_config get lmkd_native thrashing_limit_critical`
+DEF2=`getprop persist.device_config.lmkd_native.thrashing_limit_critical`
+DEF3=`getprop persist.device_config.aconfig_flags.lmkd_native.thrashing_limit_critical`
+if [ "$DEF" != null ] || [ "$DEF2" ] || [ "$DEF3" ]; then
+  device_config delete lmkd_native thrashing_limit_critical
+  resetprop -p --delete persist.device_config.lmkd_native.thrashing_limit_critical
+  resetprop -p --delete persist.device_config.aconfig_flags.lmkd_native.thrashing_limit_critical
+  resetprop lmkd.reinit 1
+fi
+}
 lmk_config() {
 stop_log
-sleep 300
 DEF=`device_config get lmkd_native swap_free_low_percentage`
 DEF2=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
 if [ "$DEF" != null ] || [ "$DEF2" ]; then
@@ -76,6 +90,8 @@ if [ "$DEF" != null ] || [ "$DEF2" ]; then
   resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
   resetprop lmkd.reinit 1
 fi
+#thrashing_limit_critical_config
+sleep 300
 lmk_config
 }
 
@@ -83,6 +99,7 @@ lmk_config
 DEF=`getprop ro.lmk.swap_free_low_percentage`
 SFLP=0
 lmk_prop
+#thrashing_limit_critical_prop
 lmk_config
 
 
