@@ -8,12 +8,12 @@
 - This module is a tool for advanced users only. There will never recommendations nor restrictions. All at user respective policies. Do not use this if you don't even know what is this! DwYOR!
 
 ## Requirements
-- Magisk or KernelSU installed
+- Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://www.pling.com/p/1539032/ via Magisk app or KernelSU app or Recovery if Magisk installed
+- Install this module https://www.pling.com/p/1539032/ via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - Reboot
-- Install Disk Info app from Play Store to see your device Swap size changes
+- Tap "Action" or run action.sh to see the results
 
 ## Optionals
 - https://t.me/ryukinotes/6

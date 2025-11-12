@@ -46,7 +46,6 @@ if [ "$KSU" == true ]; then
   ui_print " KSUVersion=$KSU_VER"
   ui_print " KSUVersionCode=$KSU_VER_CODE"
   ui_print " KSUKernelVersionCode=$KSU_KERNEL_VER_CODE"
-  sed -i 's|#k||g' $MODPATH/post-fs-data.sh
 else
   ui_print " MagiskVersion=$MAGISK_VER"
   ui_print " MagiskVersionCode=$MAGISK_VER_CODE"
@@ -58,15 +57,25 @@ ui_print "- Cleaning..."
 remove_sepolicy_rule
 ui_print " "
 
+# free
+/system/bin/free
+ui_print " "
+
 # disksize
 PROP=`grep_prop zram.resize $OPTIONALS`
 ZRAM=/block/zram0
+FILE=/sys$ZRAM/disksize
+FILE2=/sys$ZRAM/comp_algorithm
+CUR=`cat $FILE`
+CUR2=`cat $FILE2`
+ui_print "- Current $FILE = $CUR byte"
+ui_print " "
+ui_print "- Current $FILE2 = $CUR2"
+ui_print " "
 if [ "$PROP" == 0 ]; then
   ui_print "- ZRAM Swap will be disabled"
   ui_print " "
-  LMK=false
 else
-  FILE=/sys$ZRAM/disksize
   ui_print "- Changes $FILE"
   sed -i 's|#o||g' $MODPATH/service.sh
   if echo "$PROP" | grep -q %; then
@@ -83,14 +92,13 @@ else
   ui_print " "
   PROP=`grep_prop zram.algo $OPTIONALS`
   if [ "$PROP" ]; then
-    FILE=/sys$ZRAM/comp_algorithm
-    if grep -q "$PROP" $FILE; then
-      ui_print "- Changes $FILE"
+    if grep -q "$PROP" $FILE2; then
+      ui_print "- Changes $FILE2"
       ui_print "  to $PROP"
       sed -i "s|ALGO=|ALGO=$PROP|g" $MODPATH/service.sh
     else
       ui_print "! $PROP is unsupported"
-      ui_print "  in $FILE"
+      ui_print "  in $FILE2"
     fi
     ui_print " "
   fi
@@ -114,6 +122,9 @@ if [ "$PROP" ]; then
   fi
 fi
 FILE=/proc/sys/vm/swappiness
+CUR=`cat $FILE`
+ui_print "- Current $FILE = $CUR"
+ui_print " "
 ui_print "- Changes $FILE"
 if [ "$PROP" ]; then
   ui_print "  to $PROP"
@@ -126,6 +137,9 @@ ui_print " "
 # swap_ratio_enable
 PROP=`grep_prop zram.swpre $OPTIONALS`
 FILE=/proc/sys/vm/swap_ratio_enable
+CUR=`cat $FILE`
+ui_print "- Current $FILE = $CUR"
+ui_print " "
 ui_print "- Changes $FILE"
 if [ "$PROP" == 0 ]; then
   ui_print "  to $PROP"
@@ -145,6 +159,9 @@ if [ "$PROP" ]; then
   fi
 fi
 FILE=/proc/sys/vm/swap_ratio
+CUR=`cat $FILE`
+ui_print "- Current $FILE = $CUR"
+ui_print " "
 ui_print "- Changes $FILE"
 if [ "$PROP" ]; then
   ui_print "  to $PROP"
@@ -163,6 +180,10 @@ if [ "$PROP" ]; then
     unset PROP
   fi
 fi
+CUR=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_free_low_percentage`
+ui_print "- Current swap_free_low_percentage = $CUR"
+ui_print " "
 ui_print "- Changes swap_free_low_percentage"
 if [ "$PROP" ]; then
   ui_print "  to $PROP"
@@ -172,13 +193,25 @@ else
 fi
 ui_print " "
 
-# thrashing_limit_critical
-PROP=`grep_prop zram.tlc $OPTIONALS`
-if [ "$PROP" == 1 ]; then
-  ui_print "- Does not remove thrashing_limit_critical"
+# swap_util_max
+PROP=`grep_prop zram.sum $OPTIONALS`
+if [ "$PROP" ]; then
+  if [ "$PROP" -gt 100 ]; then
+    PROP=100
+  elif [ "$PROP" -lt 0 ]; then
+    unset PROP
+  fi
+fi
+CUR=`getprop persist.device_config.lmkd_native.swap_util_max`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_util_max`
+ui_print "- Current swap_util_max = $CUR"
+ui_print " "
+ui_print "- Changes swap_util_max"
+if [ "$PROP" ]; then
+  ui_print "  to $PROP"
+  sed -i "s|SUM=100|SUM=$PROP|g" $MODPATH/service.sh
 else
-  ui_print "- Removes thrashing_limit_critical"
-  sed -i "s|#thrashing_limit_critical|thrashing_limit_critical|g" $MODPATH/service.sh
+  ui_print "  to 100"
 fi
 ui_print " "
 
