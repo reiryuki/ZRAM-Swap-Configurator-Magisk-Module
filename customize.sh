@@ -184,14 +184,22 @@ CUR=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_free_low_percentage`
 ui_print "- Current swap_free_low_percentage = $CUR"
 ui_print " "
-ui_print "- Changes swap_free_low_percentage"
-if [ "$PROP" ]; then
-  ui_print "  to $PROP"
-  sed -i "s|SFLP=0|SFLP=$PROP|g" $MODPATH/service.sh
-else
-  ui_print "  to 0"
+if [ "$PROP" != def ]; then
+  ui_print "- Changes swap_free_low_percentage"
+  if [ "$PROP" ]; then
+    ui_print "  to $PROP"
+    sed -i "s|SFLP=|SFLP=$PROP|g" $MODPATH/service.sh
+  else
+    ui_print "  to 1"
+    sed -i "s|SFLP=|SFLP=1|g" $MODPATH/service.sh
+  fi
+  ui_print " "
 fi
-ui_print " "
+if ! grep -q ro.lmk.swap_free_low_percentage /system/bin/lmkd; then
+  ui_print "! This ROM does not support"
+  ui_print "  swap_free_low_percentage parameter"
+  ui_print " "
+fi
 
 # swap_util_max
 PROP=`grep_prop zram.sum $OPTIONALS`
@@ -206,17 +214,22 @@ CUR=`getprop persist.device_config.lmkd_native.swap_util_max`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_util_max`
 ui_print "- Current swap_util_max = $CUR"
 ui_print " "
-ui_print "- Changes swap_util_max"
-if [ "$PROP" ]; then
-  ui_print "  to $PROP"
-  sed -i "s|SUM=100|SUM=$PROP|g" $MODPATH/service.sh
-else
-  ui_print "  to 100"
+if [ "$PROP" != def ]; then
+  ui_print "- Changes swap_util_max"
+  if [ "$PROP" ]; then
+    ui_print "  to $PROP"
+    sed -i "s|SUM=|SUM=$PROP|g" $MODPATH/service.sh
+  else
+    ui_print "  to 99"
+    sed -i "s|SUM=|SUM=99|g" $MODPATH/service.sh
+  fi
+  ui_print " "
 fi
-ui_print " "
-
-
-
+if ! grep -q ro.lmk.swap_util_max /system/bin/lmkd; then
+  ui_print "! This ROM does not support"
+  ui_print "  swap_util_max parameter"
+  ui_print " "
+fi
 
 
 

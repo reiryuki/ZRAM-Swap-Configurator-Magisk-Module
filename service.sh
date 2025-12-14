@@ -17,22 +17,22 @@ until [ "`getprop sys.boot_completed`" == 1 ]; do
 done
 
 # swappiness
-DEF_SWPS=`cat /proc/sys/vm/swappiness`
+SWPSDEF=`cat /proc/sys/vm/swappiness`
 SWPS=100
 echo "$SWPS" > /proc/sys/vm/swappiness
 
 # swap_ratio_enable
-DEF_SWPRE=`cat /proc/sys/vm/swap_ratio_enable`
+SWPREDEF=`cat /proc/sys/vm/swap_ratio_enable`
 SWPRE=1
 echo "$SWPRE" > /proc/sys/vm/swap_ratio_enable
 
 # swap_ratio
-DEF_SWPR=`cat /proc/sys/vm/swap_ratio`
+SWPRDEF=`cat /proc/sys/vm/swap_ratio`
 SWPR=100
 echo "$SWPR" > /proc/sys/vm/swap_ratio
 
 # zram
-DEF_DISKSIZE=`cat /sys$ZRAM/disksize`
+DISKSIZEDEF=`cat /sys$ZRAM/disksize`
 DISKSIZE=3G
 #%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
 #%MemTotal=${MemTotalStr:16:8}
@@ -40,7 +40,7 @@ DISKSIZE=3G
 #%DISKSIZE=$VALUE\K
 swapoff /dev$ZRAM
 echo 1 > /sys$ZRAM/reset
-DEF_ALGO=`cat /sys$ZRAM/comp_algorithm`
+ALGODEF=`cat /sys$ZRAM/comp_algorithm`
 ALGO=
 if [ "$ALGO" ]; then
   echo "$ALGO" > /sys$ZRAM/comp_algorithm
@@ -55,8 +55,8 @@ PRIO=0
 
 # function
 lmk_prop() {
-resetprop -n ro.lmk.swap_free_low_percentage "$SFLP"
-resetprop -n ro.lmk.swap_util_max "$SUM"
+[ "$SFLP" ] && resetprop -n ro.lmk.swap_free_low_percentage "$SFLP"
+[ "$SUM" ] && resetprop -n ro.lmk.swap_util_max "$SUM"
 resetprop lmkd.reinit 1
 }
 stop_log() {
@@ -86,12 +86,14 @@ lmk_config
 }
 
 # prop
-DEF_SFLP=`getprop ro.lmk.swap_free_low_percentage`
-SFLP=0
-DEF_SUM=`getprop ro.lmk.swap_util_max`
-SUM=100
-lmk_prop
-lmk_config
+SFLPDEF=`getprop ro.lmk.swap_free_low_percentage`
+SFLP=
+SUMDEF=`getprop ro.lmk.swap_util_max`
+SUM=
+if [ "$SFLP" ] || [ "$SUM" ]; then
+  lmk_prop
+  lmk_config
+fi
 
 
 
