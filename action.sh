@@ -43,6 +43,12 @@ CUR=`getprop persist.device_config.lmkd_native.swap_util_max`
 echo "- swap_util_max = $CUR"
 echo " "
 
+# swap_compression_ratio
+CUR=`getprop persist.device_config.lmkd_native.swap_compression_ratio`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_compression_ratio`
+echo "- swap_compression_ratio = $CUR"
+echo " "
+
 
 
 

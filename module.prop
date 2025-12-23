@@ -1,8 +1,8 @@
 id=ZRAMSwapConfigurator
 name=ZRAM Swap Configurator
-version=v2.7
-versionCode=27
+version=v2.8
+versionCode=28
 author=Rei Ryuki the Fixer
-description=Configures your device ZRAM Swap disk.
+description=Configures your device ZRAM Swap settings.
 
 
