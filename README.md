@@ -1,17 +1,68 @@
 # ZRAM Swap Configurator Magisk Module
 
 ## Descriptions
-- Configures your device ZRAM Swap settings
-- Resizes ZRAM Swap disk to 3 GB by default (READ Optionals bellow if you want different configurations!)
-- Sets several swap preferences
+- Enables and resizes ZRAM swap to 100% of RAM size
+- Configures ZRAM Swap settings
+- Please read Optionals bellow if you want any different configurations
 - What's ZRAM Swap? Read this: https://t.me/ryukinotes/58. For more detailed information, please read it at Android & Google documentation instead!
 - This module is a tool for advanced users only. There will never recommendations nor restrictions. All at user respective policies. Do not use this if you don't even know what is this! DwYOR!
 
+## Changelog
+
+v2.9
+- Fix wrong percentage swap method
+- Retry method max 10 times if swapoff is fail
+- Sets ZRAM size to 100% of RAM size by default
+- Does not set swap configurations by default except swappiness
+- Add some new Optionals
+
+v2.8
+- Add a new optional
+- Does not change swap_ratio_enable and swap_ratio by default
+- Optional zram.swpr can only be set if zram.swpre=1
+- Sets swap_compression_ratio to 0 by default
+
+v2.7
+- Sets swap_free_low_percentage to 1 by default
+- Sets swap_util_max to 99 by default
+- Add new optionals
+
+v2.6
+- Delete thrashing_limit_critical removal (I think I misunderstood this property and removing it is not a good idea)
+- Shows currents at installation
+- Add Action button to see the results
+- Sets swap_util_max to 100 by default to optimize ZRAM swap
+- Add a new optional
+
+v2.5
+- Sets /proc/sys/vm/swap_ratio_enable to 1 and /proc/sys/vm/swap_ratio to 100 by default
+- Add back thrashing_limit_critical removal
+- Add new optionals
+
+v2.4
+- Re-sets swap_free_low_percentage to 0 by default (it seems freezing issue was not caused by that)
+
+v2.3
+- Sets swap_free_low_percentage to 2 as default (setting it 1 still makes freezing in low ram devices)
+- Fix bug in uninstall.sh
+
+v2.2
+- Reverse back swap_free_low_percentage to 1 as default (setting it to 0 makes device hang and freezing sometimes lol)
+
+v2.1
+- Sets swap priority to 0 by default
+- Add an optional to change the swap priority (READ Optionals!)
+
+v2.0
+- Fix conflict with modules_update while installing via recovery if Magisk installed
+- Sets swap_free_low_percentage to 0
+- Does not remove thrashing_limit_critical
+
 ## Requirements
-- Magisk or Kitsune Mask or KernelSU or Apatch installed
+Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://www.pling.com/p/1539032/ via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Install this module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - Reboot
 - Tap "Action" or run action.sh to see the results
 
@@ -20,7 +71,7 @@
 - Global: https://t.me/ryukinotes/35
 
 ## Troubleshootings
-- Global: https://t.me/ryukinotes/34
+Global: https://t.me/ryukinotes/34
 
 ## Support & Bug Report
 - https://t.me/ryukinotes/54
@@ -31,7 +82,7 @@
 - You can contribute ideas about this Magisk Module here: https://t.me/androidappsportdevelopment
 
 ## Sponsors
-- https://t.me/ryukinotes/25
+https://t.me/ryukinotes/25
 
 
 

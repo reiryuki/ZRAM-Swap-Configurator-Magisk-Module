@@ -9,7 +9,7 @@ set -x
 ZRAM=/block/zram0
 
 # disable zram
-swapoff /dev$ZRAM
+#xswapoff /dev$ZRAM
 
 # wait
 until [ "`getprop sys.boot_completed`" == 1 ]; do
@@ -31,25 +31,51 @@ SWPRDEF=`cat /proc/sys/vm/swap_ratio`
 SWPR=
 [ "$SWPR" ] && echo "$SWPR" > /proc/sys/vm/swap_ratio
 
+# min_free_kbytes
+MFKBDEF=`cat /proc/sys/vm/min_free_kbytes`
+MFKB=
+[ "$MFKB" ] && echo "$MFKB" > /proc/sys/vm/min_free_kbytes
+
+# extra_free_kbytes
+EFKBDEF=`cat /proc/sys/vm/extra_free_kbytes`
+EFKB=
+[ "$EFKB" ] && echo "$EFKB" > /proc/sys/vm/extra_free_kbytes
+
 # zram
 DISKSIZEDEF=`cat /sys$ZRAM/disksize`
 DISKSIZE=
-#%MemTotalStr=`cat /proc/meminfo | grep MemTotal`
-#%MemTotal=${MemTotalStr:16:8}
+#%MemTotal=`awk '/MemTotal/ {print $2}' /proc/meminfo`
 #%let VALUE="$MemTotal * VAR / 100"
 #%DISKSIZE=$VALUE\K
-swapoff /dev$ZRAM
-echo 1 > /sys$ZRAM/reset
+MAX_TRY=10
+SWAPOFF=false
+if grep -q "/dev$ZRAM" /proc/swaps; then
+  for i in $(seq 1 $MAX_TRY); do
+    if swapoff /dev$ZRAM; then
+      SWAPOFF=true
+      break
+    fi
+    sleep 3
+  done
+  if grep -q "/dev$ZRAM" /proc/swaps; then
+    SWAPOFF=false
+  fi
+else
+  SWAPOFF=true
+fi
+[ "$SWAPOFF" == true ] && echo 1 > /sys$ZRAM/reset
 ALGODEF=`cat /sys$ZRAM/comp_algorithm`
 ALGO=
 [ "$ALGO" ] && echo "$ALGO" > /sys$ZRAM/comp_algorithm
-#oecho "$DISKSIZE" > /sys$ZRAM/disksize
-#omkswap /dev$ZRAM
 PRIO=
-#o/system/bin/swapon /dev$ZRAM -p "$PRIO"\
-#o|| /vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
-#o|| /system/vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
-#o|| swapon /dev$ZRAM
+#oif [ "$SWAPOFF" == true ]; then
+#o  echo "$DISKSIZE" > /sys$ZRAM/disksize
+#o  mkswap /dev$ZRAM
+#o  /system/bin/swapon /dev$ZRAM -p "$PRIO"\
+#o  || /vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
+#o  || /system/vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
+#o  || swapon /dev$ZRAM
+#ofi
 
 # function
 lmk_prop() {
