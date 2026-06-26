@@ -9,6 +9,13 @@
 
 ## Changelog
 
+v3.0
+- BOOTMODE detection
+- Parameters support detection
+- Changes of swap_free_low_percentage, swap_util_max, & swap_compression_ratio does not require reboot
+- Restores without reboot if optionals is def or not set
+- Remove loop service
+
 v2.9
 - Fix wrong percentage swap method
 - Retry method max 10 times if swapoff is fail
@@ -53,17 +60,12 @@ v2.1
 - Sets swap priority to 0 by default
 - Add an optional to change the swap priority (READ Optionals!)
 
-v2.0
-- Fix conflict with modules_update while installing via recovery if Magisk installed
-- Sets swap_free_low_percentage to 0
-- Does not remove thrashing_limit_critical
-
 ## Requirements
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://devuploads.com/rqix7az6mwli via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
-- Reboot
+- Install this module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Reboot (/proc/sys/vm/ changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 
 ## Optionals

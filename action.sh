@@ -8,7 +8,7 @@ FILE=/sys$ZRAM/disksize
 FILE2=/sys$ZRAM/comp_algorithm
 CUR=`cat $FILE`
 CUR2=`cat $FILE2`
-echo "- $FILE = $CUR byte"
+echo "- $FILE = $CUR Byte"
 echo " "
 echo "- $FILE2 = $CUR2"
 echo " "

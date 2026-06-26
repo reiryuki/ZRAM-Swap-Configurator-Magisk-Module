@@ -4,6 +4,7 @@ ui_print " "
 # var
 UID=`id -u`
 [ ! "$UID" ] && UID=0
+DEFFILE=/data/adb/modules/$MODID/debug.log
 
 # log
 if [ "$BOOTMODE" != true ]; then
@@ -55,6 +56,7 @@ ui_print " "
 # cleaning
 ui_print "- Cleaning..."
 remove_sepolicy_rule
+rm -rf $MODPATH/image
 ui_print " "
 
 # free
@@ -68,13 +70,15 @@ FILE=/sys$ZRAM/disksize
 FILE2=/sys$ZRAM/comp_algorithm
 CUR=`cat $FILE`
 CUR2=`cat $FILE2`
-ui_print "- Current $FILE = $CUR byte"
+ui_print "- Current $FILE = $CUR Byte"
 ui_print " "
 ui_print "- Current $FILE2 = $CUR2"
 ui_print " "
 if [ "$PROP" == 0 ]; then
   ui_print "- Disables ZRAM Swap."
-  ui_print "  This change requires reboot."
+  if [ "$BOOTMODE" == true ]; then
+    ui_print "  This change requires reboot."
+  fi
   ui_print " "
 else
   MemTotal=`awk '/MemTotal/ {print $2}' /proc/meminfo`
@@ -83,27 +87,32 @@ else
   if echo "$PROP" | grep -q %; then
     ui_print "  to $PROP of RAM size."
     PROP=`echo "$PROP" | sed 's|%||g'`
-    let VALUE="$MemTotal * $PROP / 100"
-    ui_print "  ($VALUE KiB)"
+    let VALUE="$MemTotal * $PROP / 100 * 1024"
+    ui_print "  ($VALUE Byte)"
     sed -i "s|VAR|$PROP|g" $MODPATH/service.sh
     sed -i 's|#%||g' $MODPATH/service.sh
   elif [ "$PROP" ]; then
-    ui_print "  to $PROP byte."
+    ui_print "  to $PROP Byte."
     sed -i "s|DISKSIZE=|DISKSIZE=$PROP|g" $MODPATH/service.sh
   else
     ui_print "  to 100% of RAM size."
-    ui_print "  ($MemTotal KiB)"
+    let VALUE="$MemTotal * 1024"
+    ui_print "  ($VALUE Byte)"
     sed -i "s|VAR|100|g" $MODPATH/service.sh
     sed -i 's|#%||g' $MODPATH/service.sh
   fi
-  ui_print "  This change requires reboot."
+  if [ "$BOOTMODE" == true ]; then
+    ui_print "  This change requires reboot."
+  fi
   ui_print " "
   PROP=`grep_prop zram.algo $OPTIONALS`
   if [ "$PROP" ]; then
     if grep -q "$PROP" $FILE2; then
       ui_print "- Changes $FILE2"
       ui_print "  to $PROP"
-      ui_print "  This change requires reboot."
+      if [ "$BOOTMODE" == true ]; then
+        ui_print "  This change requires reboot."
+      fi
       sed -i "s|ALGO=|ALGO=$PROP|g" $MODPATH/service.sh
     else
       ui_print "! $PROP is unsupported"
@@ -119,7 +128,9 @@ else
     ui_print "- Sets swap priority to 0"
     sed -i 's|PRIO=|PRIO=0|g' $MODPATH/service.sh
   fi
-  ui_print "  This change requires reboot."
+  if [ "$BOOTMODE" == true ]; then
+    ui_print "  This change requires reboot."
+  fi
   ui_print " "
 fi
 
@@ -130,8 +141,11 @@ if [ "$PROP" == true ]; then
   ui_print "  boot completed."
   ui_print "  In some cases it causes internal/external storage"
   ui_print "  not mounted."
-  ui_print "  This change requires reboot."
   sed -i 's|#o||g' $MODPATH/service.sh
+  if [ "$BOOTMODE" == true ]; then
+    ui_print "  This change requires reboot."
+  fi
+  ui_print " "
 fi
 
 # swappiness
@@ -147,19 +161,38 @@ FILE=/proc/sys/vm/swappiness
 CUR=`cat $FILE`
 ui_print "- Current $FILE = $CUR"
 ui_print " "
-if [ "$PROP" != def ]; then
-  ui_print "- Changes $FILE"
-  if [ "$PROP" ]; then
-    ui_print "  to $PROP"
-    echo "$PROP" > $FILE
-    sed -i "s|SWPS=|SWPS=$PROP|g" $MODPATH/service.sh
-  else
-    ui_print "  to 100"
-    echo 100 > $FILE
-    sed -i 's|SWPS=|SWPS=100|g' $MODPATH/service.sh
+if [ "$PROP" == def ]; then
+  if [ "$BOOTMODE" == true ]; then
+    SWPSDEF=`awk '/SWPSDEF/ {print $2}' $DEFFILE | sed 's|SWPSDEF=||g'`
+    if [ "$SWPSDEF" ] && [ "$SWPSDEF" != "$CUR" ]; then
+      ui_print "- Restores $FILE"
+      ui_print "  to default ROM setting ($SWPSDEF)"
+      echo "$SWPSDEF" > $FILE
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
   fi
-  ui_print "  This change does not require reboot."
-  ui_print " "
+else
+  if [ -f $FILE ]; then
+    ui_print "- Changes $FILE"
+    if [ "$PROP" ]; then
+      ui_print "  to $PROP"
+      [ "$BOOTMODE" == true ] && echo "$PROP" > $FILE
+      sed -i "s|SWPS=|SWPS=$PROP|g" $MODPATH/service.sh
+    else
+      ui_print "  to 100"
+      [ "$BOOTMODE" == true ] && echo 100 > $FILE
+      sed -i 's|SWPS=|SWPS=100|g' $MODPATH/service.sh
+    fi
+    if [ "$BOOTMODE" == true ]; then
+      ui_print "  This change does not require reboot."
+    fi
+    ui_print " "
+  else
+    ui_print "! This kernel does not support"
+    ui_print "  $FILE"
+    ui_print " "
+  fi
 fi
 
 # swap_ratio_enable & swap_ratio
@@ -172,20 +205,30 @@ ui_print "- Current $FILE = $CUR"
 ui_print " "
 ui_print "- Current $FILE2 = $CUR2"
 ui_print " "
-if [ "$PROP" != def ]; then
-  if [ "$PROP" == 0 ]; then
+if [ "$PROP" == 0 ]; then
+  if [ -f $FILE ]; then
     ui_print "- Changes $FILE"
     ui_print "  to 0"
-    echo 0 > $FILE
+    [ "$BOOTMODE" == true ] && echo 0 > $FILE
     sed -i 's|SWPRE=|SWPRE=0|g' $MODPATH/service.sh
-    ui_print "  This change does not require reboot."
+    if [ "$BOOTMODE" == true ]; then
+      ui_print "  This change does not require reboot."
+    fi
     ui_print " "
-  elif [ "$PROP" == 1 ]; then
+  else
+    ui_print "! This kernel does not support"
+    ui_print "  $FILE"
+    ui_print " "
+  fi
+elif [ "$PROP" == 1 ]; then
+  if [ -f $FILE ]; then
     ui_print "- Changes $FILE"
     ui_print "  to 1"
-    echo 1 > $FILE
+    [ "$BOOTMODE" == true ] && echo 1 > $FILE
     sed -i 's|SWPRE=|SWPRE=1|g' $MODPATH/service.sh
-    ui_print "  This change does not require reboot."
+    if [ "$BOOTMODE" == true ]; then
+      ui_print "  This change does not require reboot."
+    fi
     ui_print " "
     PROP=`grep_prop zram.swpr $OPTIONALS`
     if [ "$PROP" ]; then
@@ -196,10 +239,44 @@ if [ "$PROP" != def ]; then
       fi
     fi
     if [ "$PROP" ] && [ "$PROP" != def ]; then
-      ui_print "- Changes $FILE2"
-      ui_print "  to $PROP"
-      echo "$PROP" > $FILE2
-      sed -i "s|SWPR=|SWPR=$PROP|g" $MODPATH/service.sh
+      if [ -f $FILE2 ]; then
+        ui_print "- Changes $FILE2"
+        ui_print "  to $PROP"
+        [ "$BOOTMODE" == true ] && echo "$PROP" > $FILE2
+        sed -i "s|SWPR=|SWPR=$PROP|g" $MODPATH/service.sh
+        if [ "$BOOTMODE" == true ]; then
+          ui_print "  This change does not require reboot."
+        fi
+        ui_print " "
+      else
+        ui_print "! This kernel does not support"
+        ui_print "  $FILE2"
+        ui_print " "
+      fi
+    else
+      if [ "$BOOTMODE" == true ]; then
+        SWPRDEF=`awk '/SWPRDEF/ {print $2}' $DEFFILE | sed 's|SWPRDEF=||g'`
+        if [ "$SWPRDEF" ] && [ "$SWPRDEF" != "$CUR2" ]; then
+          ui_print "- Restores $FILE2"
+          ui_print "  to default ROM setting ($SWPRDEF)"
+          echo "$SWPRDEF" > $FILE2
+          ui_print "  This change does not require reboot."
+          ui_print " "
+        fi
+      fi
+    fi
+  else
+    ui_print "! This kernel does not support"
+    ui_print "  $FILE"
+    ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ]; then
+    SWPREDEF=`awk '/SWPREDEF/ {print $2}' $DEFFILE | sed 's|SWPREDEF=||g'`
+    if [ "$SWPREDEF" ] && [ "$SWPREDEF" != "$CUR" ]; then
+      ui_print "- Restores $FILE"
+      ui_print "  to default ROM setting ($SWPREDEF)"
+      echo "$SWPREDEF" > $FILE
       ui_print "  This change does not require reboot."
       ui_print " "
     fi
@@ -220,14 +297,19 @@ CUR=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
 ui_print "- Current swap_free_low_percentage = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  ui_print "- Changes swap_free_low_percentage"
-  if [ "$PROP" ]; then
+  if grep -q ro.lmk.swap_free_low_percentage /system/bin/lmkd; then
+    ui_print "- Changes swap_free_low_percentage"
     ui_print "  to $PROP"
+    if [ "$BOOTMODE" == true ]; then
+      device_config delete lmkd_native swap_free_low_percentage >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
+      resetprop -n ro.lmk.swap_free_low_percentage "$PROP"
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+    fi
     sed -i "s|SFLP=|SFLP=$PROP|g" $MODPATH/service.sh
-  fi
-  ui_print "  This change requires reboot."
-  ui_print " "
-  if ! grep -q ro.lmk.swap_free_low_percentage /system/bin/lmkd; then
+    ui_print " "
+  else
     ui_print "! This ROM does not support"
     ui_print "  swap_free_low_percentage parameter"
     ui_print " "
@@ -248,14 +330,19 @@ CUR=`getprop persist.device_config.lmkd_native.swap_util_max`
 ui_print "- Current swap_util_max = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  ui_print "- Changes swap_util_max"
-  if [ "$PROP" ]; then
+  if grep -q ro.lmk.swap_util_max /system/bin/lmkd; then
+    ui_print "- Changes swap_util_max"
     ui_print "  to $PROP"
+    if [ "$BOOTMODE" == true ]; then
+      device_config delete lmkd_native swap_util_max >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.swap_util_max
+      resetprop -n ro.lmk.swap_util_max "$PROP"
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+    fi
     sed -i "s|SUM=|SUM=$PROP|g" $MODPATH/service.sh
-  fi
-  ui_print "  This change requires reboot."
-  ui_print " "
-  if ! grep -q ro.lmk.swap_util_max /system/bin/lmkd; then
+    ui_print " "
+  else
     ui_print "! This ROM does not support"
     ui_print "  swap_util_max parameter"
     ui_print " "
@@ -276,14 +363,19 @@ CUR=`getprop persist.device_config.lmkd_native.swap_compression_ratio`
 ui_print "- Current swap_compression_ratio = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  ui_print "- Changes swap_compression_ratio"
-  if [ "$PROP" ]; then
+  if grep -q ro.lmk.swap_compression_ratio /system/bin/lmkd; then
+    ui_print "- Changes swap_compression_ratio"
     ui_print "  to $PROP"
+    if [ "$BOOTMODE" == true ]; then
+      device_config delete lmkd_native swap_compression_ratio >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.swap_compression_ratio
+      resetprop -n ro.lmk.swap_compression_ratio "$PROP"
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+    fi
     sed -i "s|SCR=|SCR=$PROP|g" $MODPATH/service.sh
-  fi
-  ui_print "  This change requires reboot."
-  ui_print " "
-  if ! grep -q ro.lmk.swap_compression_ratio /system/bin/lmkd; then
+    ui_print " "
+  else
     ui_print "! This ROM does not support"
     ui_print "  swap_compression_ratio parameter"
     ui_print " "
@@ -302,12 +394,31 @@ CUR=`cat $FILE`
 ui_print "- Current $FILE = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  ui_print "- Changes $FILE"
-  ui_print "  to $PROP"
-  echo "$PROP" > $FILE
-  sed -i "s|MFKB=|MFKB=$PROP|g" $MODPATH/service.sh
-  ui_print "  This change does not require reboot."
-  ui_print " "
+  if [ -f $FILE ]; then
+    ui_print "- Changes $FILE"
+    ui_print "  to $PROP"
+    [ "$BOOTMODE" == true ] && echo "$PROP" > $FILE
+    sed -i "s|MFKB=|MFKB=$PROP|g" $MODPATH/service.sh
+    if [ "$BOOTMODE" == true ]; then
+      ui_print "  This change does not require reboot."
+    fi
+    ui_print " "
+  else
+    ui_print "! This kernel does not support"
+    ui_print "  $FILE"
+    ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ]; then
+    MFKBDEF=`awk '/MFKBDEF/ {print $2}' $DEFFILE | sed 's|MFKBDEF=||g'`
+    if [ "$MFKBDEF" ] && [ "$MFKBDEF" != "$CUR" ]; then
+      ui_print "- Restores $FILE"
+      ui_print "  to default ROM setting ($MFKBDEF)"
+      echo "$MFKBDEF" > $FILE
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
+  fi
 fi
 
 # extra_free_kbytes
@@ -322,12 +433,31 @@ CUR=`cat $FILE`
 ui_print "- Current $FILE = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  ui_print "- Changes $FILE"
-  ui_print "  to $PROP"
-  echo "$PROP" > $FILE
-  sed -i "s|EFKB=|EFKB=$PROP|g" $MODPATH/service.sh
-  ui_print "  This change does not require reboot."
-  ui_print " "
+  if [ -f $FILE ]; then
+    ui_print "- Changes $FILE"
+    ui_print "  to $PROP"
+    [ "$BOOTMODE" == true ] && echo "$PROP" > $FILE
+    sed -i "s|EFKB=|EFKB=$PROP|g" $MODPATH/service.sh
+    if [ "$BOOTMODE" == true ]; then
+      ui_print "  This change does not require reboot."
+    fi
+    ui_print " "
+  else
+    ui_print "! This kernel does not support"
+    ui_print "  $FILE"
+    ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ]; then
+    EFKBDEF=`awk '/EFKBDEF/ {print $2}' $DEFFILE | sed 's|EFKBDEF=||g'`
+    if [ "$EFKBDEF" ] && [ "$EFKBDEF" != "$CUR" ]; then
+      ui_print "- Restores $FILE"
+      ui_print "  to default ROM setting ($EFKBDEF)"
+      echo "$EFKBDEF" > $FILE
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
+  fi
 fi
 
 
