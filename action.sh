@@ -1,5 +1,12 @@
 # free
+echo "- Free:"
 /system/bin/free
+echo " "
+
+# swaps
+FILE=/proc/swaps
+echo "- $FILE:"
+cat $FILE
 echo " "
 
 # disksize
@@ -18,49 +25,67 @@ FILE=/proc/sys/vm/swappiness
 CUR=`cat $FILE`
 echo "- $FILE = $CUR"
 echo " "
+if [ ! -f $FILE ]; then
+  echo "- This kernel does not support"
+  echo "  $FILE"
+  echo " "
+fi
 
 # swap_ratio_enable
 FILE=/proc/sys/vm/swap_ratio_enable
 CUR=`cat $FILE`
 echo "- $FILE = $CUR"
 echo " "
+if [ ! -f $FILE ]; then
+  echo "- This kernel does not support"
+  echo "  $FILE"
+  echo " "
+fi
 
 # swap_ratio
 FILE=/proc/sys/vm/swap_ratio
 CUR=`cat $FILE`
 echo "- $FILE = $CUR"
 echo " "
+if [ ! -f $FILE ]; then
+  echo "- This kernel does not support"
+  echo "  $FILE"
+  echo " "
+fi
 
 # swap_free_low_percentage
-CUR=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
-[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_free_low_percentage`
-echo "- swap_free_low_percentage = $CUR"
+NAME=swap_free_low_percentage
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+echo "- $NAME = $CUR"
 echo " "
-if ! grep -q ro.lmk.swap_free_low_percentage /system/bin/lmkd; then
-  echo "! This ROM does not support"
-  echo "  swap_free_low_percentage parameter"
+if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
+  echo "- This ROM does not support"
+  echo "  $NAME parameter"
   echo " "
 fi
 
 # swap_util_max
-CUR=`getprop persist.device_config.lmkd_native.swap_util_max`
-[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_util_max`
-echo "- swap_util_max = $CUR"
+NAME=swap_util_max
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+echo "- $NAME = $CUR"
 echo " "
-if ! grep -q ro.lmk.swap_util_max /system/bin/lmkd; then
-  echo "! This ROM does not support"
-  echo "  swap_util_max parameter"
+if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
+  echo "- This ROM does not support"
+  echo "  $NAME parameter"
   echo " "
 fi
 
 # swap_compression_ratio
-CUR=`getprop persist.device_config.lmkd_native.swap_compression_ratio`
-[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_compression_ratio`
-echo "- swap_compression_ratio = $CUR"
+NAME=swap_compression_ratio
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+echo "- $NAME = $CUR"
 echo " "
-if ! grep -q ro.lmk.swap_compression_ratio /system/bin/lmkd; then
-  echo "! This ROM does not support"
-  echo "  swap_compression_ratio parameter"
+if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
+  echo "- This ROM does not support"
+  echo "  $NAME parameter"
   echo " "
 fi
 
@@ -69,12 +94,22 @@ FILE=/proc/sys/vm/min_free_kbytes
 CUR=`cat $FILE`
 echo "- $FILE = $CUR"
 echo " "
+if [ ! -f $FILE ]; then
+  echo "- This kernel does not support"
+  echo "  $FILE"
+  echo " "
+fi
 
 # extra_free_kbytes
 FILE=/proc/sys/vm/extra_free_kbytes
 CUR=`cat $FILE`
 echo "- $FILE = $CUR"
 echo " "
+if [ ! -f $FILE ]; then
+  echo "- This kernel does not support"
+  echo "  $FILE"
+  echo " "
+fi
 
 
 

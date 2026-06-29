@@ -1,7 +1,7 @@
 id=ZRAMSwapConfigurator
 name=ZRAM Swap Configurator
-version=v3.0
-versionCode=30
+version=v3.1
+versionCode=31
 author=Rei Ryuki the Fixer
 description=Enables and resizes ZRAM swap to 100% of RAM size. Configures your device ZRAM Swap settings.
 

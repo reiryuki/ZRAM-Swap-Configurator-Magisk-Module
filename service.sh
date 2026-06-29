@@ -16,31 +16,6 @@ until [ "`getprop sys.boot_completed`" == 1 ]; do
   sleep 1
 done
 
-# swappiness
-SWPSDEF=`cat /proc/sys/vm/swappiness`
-SWPS=
-[ "$SWPS" ] && echo "$SWPS" > /proc/sys/vm/swappiness
-
-# swap_ratio_enable
-SWPREDEF=`cat /proc/sys/vm/swap_ratio_enable`
-SWPRE=
-[ "$SWPRE" ] && echo "$SWPRE" > /proc/sys/vm/swap_ratio_enable
-
-# swap_ratio
-SWPRDEF=`cat /proc/sys/vm/swap_ratio`
-SWPR=
-[ "$SWPR" ] && echo "$SWPR" > /proc/sys/vm/swap_ratio
-
-# min_free_kbytes
-MFKBDEF=`cat /proc/sys/vm/min_free_kbytes`
-MFKB=
-[ "$MFKB" ] && echo "$MFKB" > /proc/sys/vm/min_free_kbytes
-
-# extra_free_kbytes
-EFKBDEF=`cat /proc/sys/vm/extra_free_kbytes`
-EFKB=
-[ "$EFKB" ] && echo "$EFKB" > /proc/sys/vm/extra_free_kbytes
-
 # zram
 DISKSIZEDEF=`cat /sys$ZRAM/disksize`
 DISKSIZE=
@@ -49,7 +24,7 @@ DISKSIZE=
 #%DISKSIZE=$VALUE\K
 SWAPOFF=false
 if grep -q /dev$ZRAM /proc/swaps; then
-  for i in `seq 1 10`; do
+  for i in `seq 1 20`; do
     if swapoff /dev$ZRAM; then
       SWAPOFF=true
       break
@@ -75,6 +50,31 @@ PRIO=
 #o  || /system/vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o  || swapon /dev$ZRAM
 #ofi
+
+# swappiness
+SWPSDEF=`cat /proc/sys/vm/swappiness`
+SWPS=
+[ "$SWPS" ] && echo "$SWPS" > /proc/sys/vm/swappiness
+
+# swap_ratio_enable
+SWPREDEF=`cat /proc/sys/vm/swap_ratio_enable`
+SWPRE=
+[ "$SWPRE" ] && echo "$SWPRE" > /proc/sys/vm/swap_ratio_enable
+
+# swap_ratio
+SWPRDEF=`cat /proc/sys/vm/swap_ratio`
+SWPR=
+[ "$SWPR" ] && echo "$SWPR" > /proc/sys/vm/swap_ratio
+
+# min_free_kbytes
+MFKBDEF=`cat /proc/sys/vm/min_free_kbytes`
+MFKB=
+[ "$MFKB" ] && echo "$MFKB" > /proc/sys/vm/min_free_kbytes
+
+# extra_free_kbytes
+EFKBDEF=`cat /proc/sys/vm/extra_free_kbytes`
+EFKB=
+[ "$EFKB" ] && echo "$EFKB" > /proc/sys/vm/extra_free_kbytes
 
 # prop
 SFLPDEF=`getprop ro.lmk.swap_free_low_percentage`

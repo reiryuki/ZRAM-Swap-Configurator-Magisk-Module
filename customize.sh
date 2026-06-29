@@ -60,7 +60,14 @@ rm -rf $MODPATH/image
 ui_print " "
 
 # free
+ui_print "- Current free:"
 /system/bin/free
+ui_print " "
+
+# swaps
+FILE=/proc/swaps
+ui_print "- Current $FILE:"
+cat $FILE
 ui_print " "
 
 # disksize
@@ -122,7 +129,7 @@ else
   fi
   PROP=`grep_prop zram.prio $OPTIONALS`
   if [ "$PROP" ]; then
-    ui_print "- Sets swap priority $PROP"
+    ui_print "- Sets swap priority to $PROP"
     sed -i "s|PRIO=|PRIO=$PROP|g" $MODPATH/service.sh
   else
     ui_print "- Sets swap priority to 0"
@@ -131,6 +138,9 @@ else
   if [ "$BOOTMODE" == true ]; then
     ui_print "  This change requires reboot."
   fi
+  ui_print "  Please note that if your device only has 1 active swap,"
+  ui_print "  the swap priority value will remain -2 even if it was"
+  ui_print "  previously set to a different value like 0 etc."
   ui_print " "
 fi
 
@@ -162,7 +172,7 @@ CUR=`cat $FILE`
 ui_print "- Current $FILE = $CUR"
 ui_print " "
 if [ "$PROP" == def ]; then
-  if [ "$BOOTMODE" == true ]; then
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     SWPSDEF=`awk '/SWPSDEF/ {print $2}' $DEFFILE | sed 's|SWPSDEF=||g'`
     if [ "$SWPSDEF" ] && [ "$SWPSDEF" != "$CUR" ]; then
       ui_print "- Restores $FILE"
@@ -189,7 +199,7 @@ else
     fi
     ui_print " "
   else
-    ui_print "! This kernel does not support"
+    ui_print "- This kernel does not support"
     ui_print "  $FILE"
     ui_print " "
   fi
@@ -216,7 +226,7 @@ if [ "$PROP" == 0 ]; then
     fi
     ui_print " "
   else
-    ui_print "! This kernel does not support"
+    ui_print "- This kernel does not support"
     ui_print "  $FILE"
     ui_print " "
   fi
@@ -249,12 +259,12 @@ elif [ "$PROP" == 1 ]; then
         fi
         ui_print " "
       else
-        ui_print "! This kernel does not support"
+        ui_print "- This kernel does not support"
         ui_print "  $FILE2"
         ui_print " "
       fi
     else
-      if [ "$BOOTMODE" == true ]; then
+      if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
         SWPRDEF=`awk '/SWPRDEF/ {print $2}' $DEFFILE | sed 's|SWPRDEF=||g'`
         if [ "$SWPRDEF" ] && [ "$SWPRDEF" != "$CUR2" ]; then
           ui_print "- Restores $FILE2"
@@ -266,12 +276,12 @@ elif [ "$PROP" == 1 ]; then
       fi
     fi
   else
-    ui_print "! This kernel does not support"
+    ui_print "- This kernel does not support"
     ui_print "  $FILE"
     ui_print " "
   fi
 else
-  if [ "$BOOTMODE" == true ]; then
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     SWPREDEF=`awk '/SWPREDEF/ {print $2}' $DEFFILE | sed 's|SWPREDEF=||g'`
     if [ "$SWPREDEF" ] && [ "$SWPREDEF" != "$CUR" ]; then
       ui_print "- Restores $FILE"
@@ -292,27 +302,46 @@ if [ "$PROP" ]; then
     unset PROP
   fi
 fi
-CUR=`getprop persist.device_config.lmkd_native.swap_free_low_percentage`
-[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_free_low_percentage`
-ui_print "- Current swap_free_low_percentage = $CUR"
+NAME=swap_free_low_percentage
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+ui_print "- Current $NAME = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  if grep -q ro.lmk.swap_free_low_percentage /system/bin/lmkd; then
-    ui_print "- Changes swap_free_low_percentage"
+  if grep -q ro.lmk.$NAME /system/bin/lmkd; then
+    ui_print "- Changes $NAME"
     ui_print "  to $PROP"
     if [ "$BOOTMODE" == true ]; then
-      device_config delete lmkd_native swap_free_low_percentage >/dev/null 2>&1
-      resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
-      resetprop -n ro.lmk.swap_free_low_percentage "$PROP"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      resetprop -n ro.lmk.$NAME "$PROP"
       resetprop lmkd.reinit 1
       ui_print "  This change does not require reboot."
     fi
     sed -i "s|SFLP=|SFLP=$PROP|g" $MODPATH/service.sh
     ui_print " "
   else
-    ui_print "! This ROM does not support"
-    ui_print "  swap_free_low_percentage parameter"
+    ui_print "- This ROM does not support"
+    ui_print "  $NAME parameter"
     ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
+    SFLPDEF=`awk '/SFLPDEF/ {print $2}' $DEFFILE | sed 's|SFLPDEF=||g'`
+    if [ "$SFLPDEF" != "$CUR" ]; then
+      ui_print "- Restores $NAME"
+      ui_print "  to default ROM setting ($SFLPDEF)"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      if [ "$SFLPDEF" ]; then
+        resetprop -n ro.lmk.$NAME "$SFLPDEF"
+      else
+        resetprop --delete ro.lmk.$NAME
+      fi
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
   fi
 fi
 
@@ -325,27 +354,46 @@ if [ "$PROP" ]; then
     unset PROP
   fi
 fi
-CUR=`getprop persist.device_config.lmkd_native.swap_util_max`
-[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_util_max`
-ui_print "- Current swap_util_max = $CUR"
+NAME=swap_util_max
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+ui_print "- Current $NAME = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  if grep -q ro.lmk.swap_util_max /system/bin/lmkd; then
-    ui_print "- Changes swap_util_max"
+  if grep -q ro.lmk.$NAME /system/bin/lmkd; then
+    ui_print "- Changes $NAME"
     ui_print "  to $PROP"
     if [ "$BOOTMODE" == true ]; then
-      device_config delete lmkd_native swap_util_max >/dev/null 2>&1
-      resetprop -p --delete persist.device_config.lmkd_native.swap_util_max
-      resetprop -n ro.lmk.swap_util_max "$PROP"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      resetprop -n ro.lmk.$NAME "$PROP"
       resetprop lmkd.reinit 1
       ui_print "  This change does not require reboot."
     fi
     sed -i "s|SUM=|SUM=$PROP|g" $MODPATH/service.sh
     ui_print " "
   else
-    ui_print "! This ROM does not support"
-    ui_print "  swap_util_max parameter"
+    ui_print "- This ROM does not support"
+    ui_print "  $NAME parameter"
     ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
+    SUMDEF=`awk '/SUMDEF/ {print $2}' $DEFFILE | sed 's|SUMDEF=||g'`
+    if [ "$SUMDEF" != "$CUR" ]; then
+      ui_print "- Restores $NAME"
+      ui_print "  to default ROM setting ($SUMDEF)"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      if [ "$SUMDEF" ]; then
+        resetprop -n ro.lmk.$NAME "$SUMDEF"
+      else
+        resetprop --delete ro.lmk.$NAME
+      fi
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
   fi
 fi
 
@@ -358,27 +406,46 @@ if [ "$PROP" ]; then
     PROP=0
   fi
 fi
-CUR=`getprop persist.device_config.lmkd_native.swap_compression_ratio`
-[ ! "$CUR" ] && CUR=`getprop ro.lmk.swap_compression_ratio`
-ui_print "- Current swap_compression_ratio = $CUR"
+NAME=swap_compression_ratio
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+ui_print "- Current $NAME = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
-  if grep -q ro.lmk.swap_compression_ratio /system/bin/lmkd; then
-    ui_print "- Changes swap_compression_ratio"
+  if grep -q ro.lmk.$NAME /system/bin/lmkd; then
+    ui_print "- Changes $NAME"
     ui_print "  to $PROP"
     if [ "$BOOTMODE" == true ]; then
-      device_config delete lmkd_native swap_compression_ratio >/dev/null 2>&1
-      resetprop -p --delete persist.device_config.lmkd_native.swap_compression_ratio
-      resetprop -n ro.lmk.swap_compression_ratio "$PROP"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      resetprop -n ro.lmk.$NAME "$PROP"
       resetprop lmkd.reinit 1
       ui_print "  This change does not require reboot."
     fi
     sed -i "s|SCR=|SCR=$PROP|g" $MODPATH/service.sh
     ui_print " "
   else
-    ui_print "! This ROM does not support"
-    ui_print "  swap_compression_ratio parameter"
+    ui_print "- This ROM does not support"
+    ui_print "  $NAME parameter"
     ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
+    SCRDEF=`awk '/SCRDEF/ {print $2}' $DEFFILE | sed 's|SCRDEF=||g'`
+    if [ "$SCRDEF" != "$CUR" ]; then
+      ui_print "- Restores $NAME"
+      ui_print "  to default ROM setting ($SCRDEF)"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      if [ "$SCRDEF" ]; then
+        resetprop -n ro.lmk.$NAME "$SCRDEF"
+      else
+        resetprop --delete ro.lmk.$NAME
+      fi
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
   fi
 fi
 
@@ -404,12 +471,12 @@ if [ "$PROP" ] && [ "$PROP" != def ]; then
     fi
     ui_print " "
   else
-    ui_print "! This kernel does not support"
+    ui_print "- This kernel does not support"
     ui_print "  $FILE"
     ui_print " "
   fi
 else
-  if [ "$BOOTMODE" == true ]; then
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     MFKBDEF=`awk '/MFKBDEF/ {print $2}' $DEFFILE | sed 's|MFKBDEF=||g'`
     if [ "$MFKBDEF" ] && [ "$MFKBDEF" != "$CUR" ]; then
       ui_print "- Restores $FILE"
@@ -443,12 +510,12 @@ if [ "$PROP" ] && [ "$PROP" != def ]; then
     fi
     ui_print " "
   else
-    ui_print "! This kernel does not support"
+    ui_print "- This kernel does not support"
     ui_print "  $FILE"
     ui_print " "
   fi
 else
-  if [ "$BOOTMODE" == true ]; then
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     EFKBDEF=`awk '/EFKBDEF/ {print $2}' $DEFFILE | sed 's|EFKBDEF=||g'`
     if [ "$EFKBDEF" ] && [ "$EFKBDEF" != "$CUR" ]; then
       ui_print "- Restores $FILE"
@@ -460,7 +527,10 @@ else
   fi
 fi
 
-
+# copy
+if [ "$BOOTMODE" == true ]; then
+  cp -f $MODPATH/action.sh /data/adb/modules/$MODID
+fi
 
 
 

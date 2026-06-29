@@ -9,12 +9,18 @@
 
 ## Changelog
 
+v3.1
+- Shows /proc/swaps
+- Restores swap_\* without reboot if the optionals are def or not set (I forgot to add this in v3.0)
+
 v3.0
 - BOOTMODE detection
 - Parameters support detection
 - Changes of swap_free_low_percentage, swap_util_max, & swap_compression_ratio does not require reboot
-- Restores without reboot if optionals is def or not set
+- Restores without reboot if the optionals are def or not set
 - Remove loop service
+- Resets module folder/files permissions at post-fs-data
+- Move _uninstall.log to /data/adb/logs/
 
 v2.9
 - Fix wrong percentage swap method
@@ -56,16 +62,12 @@ v2.3
 v2.2
 - Reverse back swap_free_low_percentage to 1 as default (setting it to 0 makes device hang and freezing sometimes lol)
 
-v2.1
-- Sets swap priority to 0 by default
-- Add an optional to change the swap priority (READ Optionals!)
-
 ## Requirements
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://devuploads.com/f11uljbjj36c via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
-- Reboot (/proc/sys/vm/ changes does not require reboot)
+- Install this module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Reboot (/proc/sys/vm/ and swap_\* changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 
 ## Optionals
