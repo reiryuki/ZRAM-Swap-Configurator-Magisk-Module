@@ -10,6 +10,8 @@
 ## Changelog
 
 v3.1
+- swapoff max try 20 times
+- Fix failed swapon
 - Shows /proc/swaps
 - Restores swap_\* without reboot if the optionals are def or not set (I forgot to add this in v3.0)
 

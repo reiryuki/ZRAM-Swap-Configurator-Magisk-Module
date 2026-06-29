@@ -138,9 +138,6 @@ else
   if [ "$BOOTMODE" == true ]; then
     ui_print "  This change requires reboot."
   fi
-  ui_print "  Please note that if your device only has 1 active swap,"
-  ui_print "  the swap priority value will remain -2 even if it was"
-  ui_print "  previously set to a different value like 0 etc."
   ui_print " "
 fi
 
