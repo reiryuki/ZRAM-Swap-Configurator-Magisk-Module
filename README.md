@@ -68,7 +68,7 @@ v2.2
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module (Link is under maintenance) via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Install this module https://devuploads.com/7sy6l97mu5lm via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - Reboot (/proc/sys/vm/ and swap_\* changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 
