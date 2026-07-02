@@ -9,11 +9,14 @@
 
 ## Changelog
 
+v3.2
+- Stores default values to /data/adb/modules/$MODID/debug.log if it's not exist yet
+
 v3.1
 - swapoff max try 20 times
 - Fix failed swapon
 - Shows /proc/swaps
-- Restores swap_\* without reboot if the optionals are def or not set (I forgot to add this in v3.0)
+- Restores swap_\* without reboot if the optionals are def or not set
 
 v3.0
 - BOOTMODE detection
@@ -55,20 +58,17 @@ v2.5
 - Add new optionals
 
 v2.4
-- Re-sets swap_free_low_percentage to 0 by default (it seems freezing issue was not caused by that)
+- Re-sets swap_free_low_percentage to 0 by default
 
 v2.3
-- Sets swap_free_low_percentage to 2 as default (setting it 1 still makes freezing in low ram devices)
+- Sets swap_free_low_percentage to 2 as default
 - Fix bug in uninstall.sh
-
-v2.2
-- Reverse back swap_free_low_percentage to 1 as default (setting it to 0 makes device hang and freezing sometimes lol)
 
 ## Requirements
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://devuploads.com/7sy6l97mu5lm via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Install this module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - Reboot (/proc/sys/vm/ and swap_\* changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 

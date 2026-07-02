@@ -155,6 +155,49 @@ if [ "$PROP" == true ]; then
   ui_print " "
 fi
 
+# default
+if [ "$BOOTMODE" == true ] && [ ! -f $DEFFILE ]; then
+  mkdir -p `dirname $DEFFILE`
+  FILE=/proc/sys/vm/swappiness
+  if [ -f $FILE ]; then
+    echo "SWPSDEF=`cat $FILE`" >> $DEFFILE
+  fi
+  FILE=/proc/sys/vm/swap_ratio_enable
+  if [ -f $FILE ]; then
+    echo "SWPREDEF=`cat $FILE`" >> $DEFFILE
+  fi
+  FILE=/proc/sys/vm/swap_ratio
+  if [ -f $FILE ]; then
+    echo "SWPRDEF=`cat $FILE`" >> $DEFFILE
+  fi
+  FILE=/proc/sys/vm/min_free_kbytes
+  if [ -f $FILE ]; then
+    echo "MFKBDEF=`cat $FILE`" >> $DEFFILE
+  fi
+  FILE=/proc/sys/vm/extra_free_kbytes
+  if [ -f $FILE ]; then
+    echo "EFKBDEF=`cat $FILE`" >> $DEFFILE
+  fi
+  NAME=swap_free_low_percentage
+  CUR=`getprop persist.device_config.lmkd_native.$NAME`
+  [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+  if [ "$CUR" ]; then
+    echo "SFLPDEF=$CUR" >> $DEFFILE
+  fi
+  NAME=swap_util_max
+  CUR=`getprop persist.device_config.lmkd_native.$NAME`
+  [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+  if [ "$CUR" ]; then
+    echo "SUMDEF=$CUR" >> $DEFFILE
+  fi
+  NAME=swap_compression_ratio
+  CUR=`getprop persist.device_config.lmkd_native.$NAME`
+  [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+  if [ "$CUR" ]; then
+    echo "SCRDEF=$CUR" >> $DEFFILE
+  fi
+fi
+
 # swappiness
 PROP=`grep_prop zram.swps $OPTIONALS`
 if [ "$PROP" ]; then
@@ -526,7 +569,8 @@ fi
 
 # copy
 if [ "$BOOTMODE" == true ]; then
-  cp -f $MODPATH/action.sh /data/adb/modules/$MODID
+  mkdir -p `dirname $DEFFILE`
+  cp -f $MODPATH/action.sh `dirname $DEFFILE`
 fi
 
 
