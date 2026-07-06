@@ -141,20 +141,6 @@ else
   ui_print " "
 fi
 
-# fix
-PROP=`grep_prop zram.fix $OPTIONALS`
-if [ "$PROP" == true ]; then
-  ui_print "- Using ZRAM fix method by disabling ZRAM before"
-  ui_print "  boot completed."
-  ui_print "  In some cases it causes internal/external storage"
-  ui_print "  not mounted."
-  sed -i 's|#o||g' $MODPATH/service.sh
-  if [ "$BOOTMODE" == true ]; then
-    ui_print "  This change requires reboot."
-  fi
-  ui_print " "
-fi
-
 # default
 if [ "$BOOTMODE" == true ] && [ ! -f $DEFFILE ]; then
   mkdir -p `dirname $DEFFILE`

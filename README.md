@@ -9,6 +9,10 @@
 
 ## Changelog
 
+v3.3
+- ZRAM does not wait for boot completed to fix lags on boot
+- Remove zram.fix optional
+
 v3.2
 - Stores default values to /data/adb/modules/$MODID/debug.log if it's not exist yet
 
@@ -60,15 +64,11 @@ v2.5
 v2.4
 - Re-sets swap_free_low_percentage to 0 by default
 
-v2.3
-- Sets swap_free_low_percentage to 2 as default
-- Fix bug in uninstall.sh
-
 ## Requirements
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://devuploads.com/jh13tlvupm91 via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Install this module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - Reboot (/proc/sys/vm/ and swap_\* changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 
@@ -85,7 +85,7 @@ Global: https://t.me/ryukinotes/34
 
 ## Credits and Contributors
 - https://t.me/androidryukimodsdiscussions
-- You can contribute ideas about this Magisk Module here: https://t.me/androidappsportdevelopment
+- https://t.me/androidappsportdevelopment
 
 ## Sponsors
 https://t.me/ryukinotes/25

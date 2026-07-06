@@ -5,18 +5,8 @@ LOGFILE=$MODPATH/debug.log
 exec 2>$LOGFILE
 set -x
 
-# var
-ZRAM=/block/zram0
-
-# disable zram
-#xswapoff /dev$ZRAM
-
-# wait
-until [ "`getprop sys.boot_completed`" == 1 ]; do
-  sleep 1
-done
-
 # zram
+ZRAM=/block/zram0
 DISKSIZEDEF=`cat /sys$ZRAM/disksize`
 DISKSIZE=
 #%MemTotal=`awk '/MemTotal/ {print $2}' /proc/meminfo`
@@ -50,6 +40,11 @@ PRIO=
 #o  || /system/vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o  || swapon /dev$ZRAM
 #ofi
+
+# wait
+until [ "`getprop sys.boot_completed`" == 1 ]; do
+  sleep 1
+done
 
 # swappiness
 SWPSDEF=`cat /proc/sys/vm/swappiness`
@@ -101,11 +96,6 @@ fi
 if [ "$SFLP" ] || [ "$SUM" ] || [ "$SCR" ]; then
   resetprop lmkd.reinit 1
 fi
-
-
-
-
-
 
 
 
