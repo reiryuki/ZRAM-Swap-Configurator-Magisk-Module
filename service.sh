@@ -27,19 +27,20 @@ if grep -q /dev$ZRAM /proc/swaps; then
 else
   SWAPOFF=true
 fi
-[ "$SWAPOFF" == true ] && echo 1 > /sys$ZRAM/reset
 ALGODEF=`cat /sys$ZRAM/comp_algorithm`
 ALGO=
-[ "$ALGO" ] && echo "$ALGO" > /sys$ZRAM/comp_algorithm
+PRIODEF=`cat /proc/swaps | awk 'NR>1 {print $5}'`
 PRIO=
-#oif [ "$SWAPOFF" == true ]; then
+if $SWAPOFF; then
+  echo 1 > /sys$ZRAM/reset
+  [ "$ALGO" ] && echo "$ALGO" > /sys$ZRAM/comp_algorithm
 #o  echo "$DISKSIZE" > /sys$ZRAM/disksize
 #o  mkswap /dev$ZRAM
 #o  /system/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o  || /vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o  || /system/vendor/bin/swapon /dev$ZRAM -p "$PRIO"\
 #o  || swapon /dev$ZRAM
-#ofi
+fi
 
 # wait
 until [ "`getprop sys.boot_completed`" == 1 ]; do
@@ -47,53 +48,70 @@ until [ "`getprop sys.boot_completed`" == 1 ]; do
 done
 
 # swappiness
-SWPSDEF=`cat /proc/sys/vm/swappiness`
+FILE=/proc/sys/vm/swappiness
+SWPSDEF=`cat $FILE`
 SWPS=
-[ "$SWPS" ] && echo "$SWPS" > /proc/sys/vm/swappiness
+[ "$SWPS" ] && echo "$SWPS" > $FILE
 
 # swap_ratio_enable
-SWPREDEF=`cat /proc/sys/vm/swap_ratio_enable`
+FILE=/proc/sys/vm/swap_ratio_enable
+SWPREDEF=`cat $FILE`
 SWPRE=
-[ "$SWPRE" ] && echo "$SWPRE" > /proc/sys/vm/swap_ratio_enable
+[ "$SWPRE" ] && echo "$SWPRE" > $FILE
 
 # swap_ratio
-SWPRDEF=`cat /proc/sys/vm/swap_ratio`
+FILE=/proc/sys/vm/swap_ratio
+SWPRDEF=`cat $FILE`
 SWPR=
-[ "$SWPR" ] && echo "$SWPR" > /proc/sys/vm/swap_ratio
+[ "$SWPR" ] && echo "$SWPR" > $FILE
 
 # min_free_kbytes
-MFKBDEF=`cat /proc/sys/vm/min_free_kbytes`
+FILE=/proc/sys/vm/min_free_kbytes
+MFKBDEF=`cat $FILE`
 MFKB=
-[ "$MFKB" ] && echo "$MFKB" > /proc/sys/vm/min_free_kbytes
+[ "$MFKB" ] && echo "$MFKB" > $FILE
 
 # extra_free_kbytes
-EFKBDEF=`cat /proc/sys/vm/extra_free_kbytes`
+FILE=/proc/sys/vm/extra_free_kbytes
+EFKBDEF=`cat $FILE`
 EFKB=
-[ "$EFKB" ] && echo "$EFKB" > /proc/sys/vm/extra_free_kbytes
+[ "$EFKB" ] && echo "$EFKB" > $FILE
 
 # prop
-SFLPDEF=`getprop ro.lmk.swap_free_low_percentage`
+NAME=swap_free_low_percentage
+SFLPDEF=`getprop ro.lmk.$NAME`
 SFLP=
-SUMDEF=`getprop ro.lmk.swap_util_max`
-SUM=
-SCRDEF=`getprop ro.lmk.swap_compression_ratio`
-SCR=
 if [ "$SFLP" ]; then
-  resetprop -n ro.lmk.swap_free_low_percentage "$SFLP"
-  device_config delete lmkd_native swap_free_low_percentage
-  resetprop -p --delete persist.device_config.lmkd_native.swap_free_low_percentage
+  resetprop -n ro.lmk.$NAME "$SFLP"
+  device_config delete lmkd_native $NAME
+  resetprop -p --delete persist.device_config.lmkd_native.$NAME
 fi
+NAME=swap_util_max
+SUMDEF=`getprop ro.lmk.$NAME`
+SUM=
 if [ "$SUM" ]; then
-  resetprop -n ro.lmk.swap_util_max "$SUM"
-  device_config delete lmkd_native swap_util_max
-  resetprop -p --delete persist.device_config.lmkd_native.swap_util_max
+  resetprop -n ro.lmk.$NAME "$SUM"
+  device_config delete lmkd_native $NAME
+  resetprop -p --delete persist.device_config.lmkd_native.$NAME
 fi
+NAME=swap_compression_ratio
+SCRDEF=`getprop ro.lmk.$NAME`
+SCR=
 if [ "$SCR" ]; then
-  resetprop -n ro.lmk.swap_compression_ratio "$SCR"
-  device_config delete lmkd_native swap_compression_ratio
-  resetprop -p --delete persist.device_config.lmkd_native.swap_compression_ratio
+  resetprop -n ro.lmk.$NAME "$SCR"
+  device_config delete lmkd_native $NAME
+  resetprop -p --delete persist.device_config.lmkd_native.$NAME
 fi
-if [ "$SFLP" ] || [ "$SUM" ] || [ "$SCR" ]; then
+NAME=medium
+MEDDEF==`getprop ro.lmk.$NAME`
+MED=
+if [ "$MED" ]; then
+  resetprop -n ro.lmk.$NAME "$MED"
+  device_config delete lmkd_native $NAME
+  resetprop -p --delete persist.device_config.lmkd_native.$NAME
+fi
+if [ "$SFLP" ] || [ "$SUM" ]\
+|| [ "$SCR" ] || [ "$MED" ]; then
   resetprop lmkd.reinit 1
 fi
 

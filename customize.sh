@@ -34,9 +34,6 @@ if [ "$BOOTMODE" != true ]; then
   rm -rf $MODPATH_UPDATE
 fi
 
-# run
-. $MODPATH/function.sh
-
 # info
 MODVER=`grep_prop version $MODPATH/module.prop`
 MODVERCODE=`grep_prop versionCode $MODPATH/module.prop`
@@ -54,10 +51,7 @@ fi
 ui_print " "
 
 # cleaning
-ui_print "- Cleaning..."
-remove_sepolicy_rule
 rm -rf $MODPATH/image
-ui_print " "
 
 # free
 ui_print "- Current free:"
@@ -142,45 +136,51 @@ else
 fi
 
 # default
-if [ "$BOOTMODE" == true ] && [ ! -f $DEFFILE ]; then
+if [ "$BOOTMODE" == true ]; then
   mkdir -p `dirname $DEFFILE`
   FILE=/proc/sys/vm/swappiness
-  if [ -f $FILE ]; then
-    echo "SWPSDEF=`cat $FILE`" >> $DEFFILE
+  if [ -f $FILE ] && ! grep -q SWPSDEF= $DEFFILE; then
+    echo "+ SWPSDEF=`cat $FILE`" >> $DEFFILE
   fi
   FILE=/proc/sys/vm/swap_ratio_enable
-  if [ -f $FILE ]; then
-    echo "SWPREDEF=`cat $FILE`" >> $DEFFILE
+  if [ -f $FILE ] && ! grep -q SWPREDEF= $DEFFILE; then
+    echo "+ SWPREDEF=`cat $FILE`" >> $DEFFILE
   fi
   FILE=/proc/sys/vm/swap_ratio
-  if [ -f $FILE ]; then
-    echo "SWPRDEF=`cat $FILE`" >> $DEFFILE
+  if [ -f $FILE ] && ! grep -q SWPRDEF= $DEFFILE; then
+    echo "+ SWPRDEF=`cat $FILE`" >> $DEFFILE
   fi
   FILE=/proc/sys/vm/min_free_kbytes
-  if [ -f $FILE ]; then
-    echo "MFKBDEF=`cat $FILE`" >> $DEFFILE
+  if [ -f $FILE ] && ! grep -q MFKBDEF= $DEFFILE; then
+    echo "+ MFKBDEF=`cat $FILE`" >> $DEFFILE
   fi
   FILE=/proc/sys/vm/extra_free_kbytes
-  if [ -f $FILE ]; then
-    echo "EFKBDEF=`cat $FILE`" >> $DEFFILE
+  if [ -f $FILE ] && ! grep -q EFKBDEF= $DEFFILE; then
+    echo "+ EFKBDEF=`cat $FILE`" >> $DEFFILE
   fi
   NAME=swap_free_low_percentage
   CUR=`getprop persist.device_config.lmkd_native.$NAME`
   [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-  if [ "$CUR" ]; then
-    echo "SFLPDEF=$CUR" >> $DEFFILE
+  if [ "$CUR" ] && ! grep -q SFLPDEF= $DEFFILE; then
+    echo "+ SFLPDEF=$CUR" >> $DEFFILE
   fi
   NAME=swap_util_max
   CUR=`getprop persist.device_config.lmkd_native.$NAME`
   [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-  if [ "$CUR" ]; then
-    echo "SUMDEF=$CUR" >> $DEFFILE
+  if [ "$CUR" ] && ! grep -q SUMDEF= $DEFFILE; then
+    echo "+ SUMDEF=$CUR" >> $DEFFILE
   fi
   NAME=swap_compression_ratio
   CUR=`getprop persist.device_config.lmkd_native.$NAME`
   [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-  if [ "$CUR" ]; then
-    echo "SCRDEF=$CUR" >> $DEFFILE
+  if [ "$CUR" ] && ! grep -q SCRDEF= $DEFFILE; then
+    echo "+ SCRDEF=$CUR" >> $DEFFILE
+  fi
+  NAME=medium
+  CUR=`getprop persist.device_config.lmkd_native.$NAME`
+  [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+  if [ "$CUR" ] && ! grep -q MEDDEF= $DEFFILE; then
+    echo "+ MEDDEF=$CUR" >> $DEFFILE
   fi
 fi
 
@@ -331,11 +331,11 @@ fi
 NAME=swap_free_low_percentage
 CUR=`getprop persist.device_config.lmkd_native.$NAME`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-ui_print "- Current $NAME = $CUR"
+ui_print "- Current lmk $NAME = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
   if grep -q ro.lmk.$NAME /system/bin/lmkd; then
-    ui_print "- Changes $NAME"
+    ui_print "- Changes lmk $NAME"
     ui_print "  to $PROP"
     if [ "$BOOTMODE" == true ]; then
       device_config delete lmkd_native $NAME >/dev/null 2>&1
@@ -355,7 +355,7 @@ else
   if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     SFLPDEF=`awk '/SFLPDEF/ {print $2}' $DEFFILE | sed 's|SFLPDEF=||g'`
     if [ "$SFLPDEF" != "$CUR" ]; then
-      ui_print "- Restores $NAME"
+      ui_print "- Restores lmk $NAME"
       ui_print "  to default ROM setting ($SFLPDEF)"
       device_config delete lmkd_native $NAME >/dev/null 2>&1
       resetprop -p --delete persist.device_config.lmkd_native.$NAME
@@ -383,11 +383,11 @@ fi
 NAME=swap_util_max
 CUR=`getprop persist.device_config.lmkd_native.$NAME`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-ui_print "- Current $NAME = $CUR"
+ui_print "- Current lmk $NAME = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
   if grep -q ro.lmk.$NAME /system/bin/lmkd; then
-    ui_print "- Changes $NAME"
+    ui_print "- Changes lmk $NAME"
     ui_print "  to $PROP"
     if [ "$BOOTMODE" == true ]; then
       device_config delete lmkd_native $NAME >/dev/null 2>&1
@@ -407,7 +407,7 @@ else
   if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     SUMDEF=`awk '/SUMDEF/ {print $2}' $DEFFILE | sed 's|SUMDEF=||g'`
     if [ "$SUMDEF" != "$CUR" ]; then
-      ui_print "- Restores $NAME"
+      ui_print "- Restores lmk $NAME"
       ui_print "  to default ROM setting ($SUMDEF)"
       device_config delete lmkd_native $NAME >/dev/null 2>&1
       resetprop -p --delete persist.device_config.lmkd_native.$NAME
@@ -435,11 +435,11 @@ fi
 NAME=swap_compression_ratio
 CUR=`getprop persist.device_config.lmkd_native.$NAME`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-ui_print "- Current $NAME = $CUR"
+ui_print "- Current lmk $NAME = $CUR"
 ui_print " "
 if [ "$PROP" ] && [ "$PROP" != def ]; then
   if grep -q ro.lmk.$NAME /system/bin/lmkd; then
-    ui_print "- Changes $NAME"
+    ui_print "- Changes lmk $NAME"
     ui_print "  to $PROP"
     if [ "$BOOTMODE" == true ]; then
       device_config delete lmkd_native $NAME >/dev/null 2>&1
@@ -459,7 +459,7 @@ else
   if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
     SCRDEF=`awk '/SCRDEF/ {print $2}' $DEFFILE | sed 's|SCRDEF=||g'`
     if [ "$SCRDEF" != "$CUR" ]; then
-      ui_print "- Restores $NAME"
+      ui_print "- Restores lmk $NAME"
       ui_print "  to default ROM setting ($SCRDEF)"
       device_config delete lmkd_native $NAME >/dev/null 2>&1
       resetprop -p --delete persist.device_config.lmkd_native.$NAME
@@ -547,6 +547,51 @@ else
       ui_print "- Restores $FILE"
       ui_print "  to default ROM setting ($EFKBDEF)"
       echo "$EFKBDEF" > $FILE
+      ui_print "  This change does not require reboot."
+      ui_print " "
+    fi
+  fi
+fi
+
+# medium
+PROP=`grep_prop zram.med $OPTIONALS`
+NAME=medium
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+ui_print "- Current lmk $NAME = $CUR"
+ui_print " "
+if [ "$PROP" ] && [ "$PROP" != def ]; then
+  if grep -q ro.lmk.$NAME /system/bin/lmkd; then
+    ui_print "- Changes lmk $NAME"
+    ui_print "  to $PROP"
+    if [ "$BOOTMODE" == true ]; then
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      resetprop -n ro.lmk.$NAME "$PROP"
+      resetprop lmkd.reinit 1
+      ui_print "  This change does not require reboot."
+    fi
+    sed -i "s|MED=|MED=$PROP|g" $MODPATH/service.sh
+    ui_print " "
+  else
+    ui_print "- This ROM does not support"
+    ui_print "  $NAME parameter"
+    ui_print " "
+  fi
+else
+  if [ "$BOOTMODE" == true ] && [ -f $DEFFILE ]; then
+    MEDDEF=`awk '/MEDDEF/ {print $2}' $DEFFILE | sed 's|MEDDEF=||g'`
+    if [ "$MEDDEF" != "$CUR" ]; then
+      ui_print "- Restores lmk $NAME"
+      ui_print "  to default ROM setting ($MEDDEF)"
+      device_config delete lmkd_native $NAME >/dev/null 2>&1
+      resetprop -p --delete persist.device_config.lmkd_native.$NAME
+      if [ "$MEDDEF" ]; then
+        resetprop -n ro.lmk.$NAME "$MEDDEF"
+      else
+        resetprop --delete ro.lmk.$NAME
+      fi
+      resetprop lmkd.reinit 1
       ui_print "  This change does not require reboot."
       ui_print " "
     fi

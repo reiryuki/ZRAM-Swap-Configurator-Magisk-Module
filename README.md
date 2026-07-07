@@ -9,12 +9,17 @@
 
 ## Changelog
 
+v3.4
+- Add zram.med optional
+- Fix wrong logic while storing default values if they don't yet exist
+- Remove unimportant files
+
 v3.3
 - ZRAM does not wait for boot completed to fix lags on boot
 - Remove zram.fix optional
 
 v3.2
-- Stores default values to /data/adb/modules/$MODID/debug.log if it's not exist yet
+- Stores default values to /data/adb/modules/$MODID/debug.log if they don't yet exist
 
 v3.1
 - swapoff max try 20 times
@@ -61,15 +66,12 @@ v2.5
 - Add back thrashing_limit_critical removal
 - Add new optionals
 
-v2.4
-- Re-sets swap_free_low_percentage to 0 by default
-
 ## Requirements
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://devuploads.com/3kt7dw8fv8rl via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
-- Reboot (/proc/sys/vm/ and swap_\* changes does not require reboot)
+- Install this module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Reboot (/proc/sys/vm/ and lmk changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 
 ## Optionals

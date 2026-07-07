@@ -57,7 +57,7 @@ fi
 NAME=swap_free_low_percentage
 CUR=`getprop persist.device_config.lmkd_native.$NAME`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-echo "- $NAME = $CUR"
+echo "- lmk $NAME = $CUR"
 echo " "
 if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
   echo "- This ROM does not support"
@@ -69,7 +69,7 @@ fi
 NAME=swap_util_max
 CUR=`getprop persist.device_config.lmkd_native.$NAME`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-echo "- $NAME = $CUR"
+echo "- lmk $NAME = $CUR"
 echo " "
 if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
   echo "- This ROM does not support"
@@ -81,7 +81,7 @@ fi
 NAME=swap_compression_ratio
 CUR=`getprop persist.device_config.lmkd_native.$NAME`
 [ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
-echo "- $NAME = $CUR"
+echo "- lmk $NAME = $CUR"
 echo " "
 if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
   echo "- This ROM does not support"
@@ -111,6 +111,17 @@ if [ ! -f $FILE ]; then
   echo " "
 fi
 
+# medium
+NAME=medium
+CUR=`getprop persist.device_config.lmkd_native.$NAME`
+[ ! "$CUR" ] && CUR=`getprop ro.lmk.$NAME`
+echo "- lmk $NAME = $CUR"
+echo " "
+if ! grep -q ro.lmk.$NAME /system/bin/lmkd; then
+  echo "- This ROM does not support"
+  echo "  $NAME parameter"
+  echo " "
+fi
 
 
 
