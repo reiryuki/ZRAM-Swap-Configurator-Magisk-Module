@@ -78,40 +78,87 @@ EFKB=
 [ "$EFKB" ] && echo "$EFKB" > $FILE
 
 # prop
+LMKD=/system/bin/lmkd
 NAME=swap_free_low_percentage
-SFLPDEF=`getprop ro.lmk.$NAME`
+PROP=persist.device_config.lmkd_native.$NAME
+PROP2=ro.lmk.$NAME
+if ! grep -q $PROP $LMKD\
+&& grep -q $PROP2 $LMKD; then
+  PROP=$PROP2
+fi
+SFLPDEF=`getprop $PROP`
 SFLP=
 if [ "$SFLP" ]; then
-  resetprop -n ro.lmk.$NAME "$SFLP"
-  device_config delete lmkd_native $NAME
-  resetprop -p --delete persist.device_config.lmkd_native.$NAME
+  resetprop -p --delete $PROP
+  resetprop -n $PROP "$SFLP"
 fi
 NAME=swap_util_max
-SUMDEF=`getprop ro.lmk.$NAME`
+PROP=persist.device_config.lmkd_native.$NAME
+PROP2=ro.lmk.$NAME
+if ! grep -q $PROP $LMKD\
+&& grep -q $PROP2 $LMKD; then
+  PROP=$PROP2
+fi
+SUMDEF=`getprop $PROP`
 SUM=
 if [ "$SUM" ]; then
-  resetprop -n ro.lmk.$NAME "$SUM"
-  device_config delete lmkd_native $NAME
-  resetprop -p --delete persist.device_config.lmkd_native.$NAME
+  resetprop -p --delete $PROP
+  resetprop -n $PROP "$SUM"
 fi
 NAME=swap_compression_ratio
-SCRDEF=`getprop ro.lmk.$NAME`
+PROP=persist.device_config.lmkd_native.$NAME
+PROP2=ro.lmk.$NAME
+if ! grep -q $PROP $LMKD\
+&& grep -q $PROP2 $LMKD; then
+  PROP=$PROP2
+fi
+SCRDEF=`getprop $PROP`
 SCR=
 if [ "$SCR" ]; then
-  resetprop -n ro.lmk.$NAME "$SCR"
-  device_config delete lmkd_native $NAME
-  resetprop -p --delete persist.device_config.lmkd_native.$NAME
+  resetprop -p --delete $PROP
+  resetprop -n $PROP "$SCR"
+fi
+NAME=swap_compression_ratio_div
+PROP=persist.device_config.lmkd_native.$NAME
+PROP2=ro.lmk.$NAME
+if ! grep -q $PROP $LMKD\
+&& grep -q $PROP2 $LMKD; then
+  PROP=$PROP2
+fi
+SCRDDEF=`getprop $PROP`
+SCRD=
+if [ "$SCRD" ]; then
+  resetprop -p --delete $PROP
+  resetprop -n $PROP "$SCRD"
 fi
 NAME=medium
-MEDDEF==`getprop ro.lmk.$NAME`
+PROP=persist.device_config.lmkd_native.$NAME
+PROP2=ro.lmk.$NAME
+if ! grep -q $PROP $LMKD\
+&& grep -q $PROP2 $LMKD; then
+  PROP=$PROP2
+fi
+MEDDEF=`getprop $PROP`
 MED=
 if [ "$MED" ]; then
-  resetprop -n ro.lmk.$NAME "$MED"
-  device_config delete lmkd_native $NAME
-  resetprop -p --delete persist.device_config.lmkd_native.$NAME
+  resetprop -p --delete $PROP
+  resetprop -n $PROP "$MED"
 fi
-if [ "$SFLP" ] || [ "$SUM" ]\
-|| [ "$SCR" ] || [ "$MED" ]; then
+NAME=low
+PROP=persist.device_config.lmkd_native.$NAME
+PROP2=ro.lmk.$NAME
+if ! grep -q $PROP $LMKD\
+&& grep -q $PROP2 $LMKD; then
+  PROP=$PROP2
+fi
+LOWDEF=`getprop $PROP`
+LOW=
+if [ "$LOW" ]; then
+  resetprop -p --delete $PROP
+  resetprop -n $PROP "$LOW"
+fi
+if [ "$SFLP" ] || [ "$SUM" ] || [ "$SCR" ] || [ "$SCRD" ]\
+|| [ "$MED" ] || [ "$LOW" ]; then
   resetprop lmkd.reinit 1
 fi
 

@@ -9,6 +9,10 @@
 
 ## Changelog
 
+v3.5
+- Add zram.scrd & zram.low optionals
+- Prior to use persist.device_config.lmkd_native. instead of ro.lmk. if supported
+
 v3.4
 - Add zram.med optional
 - Fix wrong logic while storing default values if they don't yet exist
@@ -58,19 +62,14 @@ v2.6
 - Delete thrashing_limit_critical removal (I think I misunderstood this property and removing it is not a good idea)
 - Shows currents at installation
 - Add Action button to see the results
-- Sets swap_util_max to 100 by default to optimize ZRAM swap
+- Sets swap_util_max to 100 by default
 - Add a new optional
-
-v2.5
-- Sets /proc/sys/vm/swap_ratio_enable to 1 and /proc/sys/vm/swap_ratio to 100 by default
-- Add back thrashing_limit_critical removal
-- Add new optionals
 
 ## Requirements
 Magisk or Kitsune Mask or KernelSU or Apatch installed
 
 ## Installation Guide & Download Link
-- Install this module https://devuploads.com/5kpy7g4dn0n9 via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
+- Install this module https://github.com/reiryuki/ZRAM-Swap-Configurator-Magisk-Module via Magisk app or Kitsune Mask app or KernelSU app or Apatch app or Recovery if Magisk or Kitsune Mask installed
 - Reboot (/proc/sys/vm/ and lmk changes does not require reboot)
 - Tap "Action" or run action.sh to see the results
 
